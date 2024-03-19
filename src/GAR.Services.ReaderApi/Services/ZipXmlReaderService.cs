@@ -23,11 +23,14 @@ public class ZipXmlReaderService(
     private readonly ZipArchive _zipArchive = ZipFile.OpenRead(@$"Data/gar_xml.zip");
 
     private XmlReader? _addressXmlReader;
+    private XmlReader? _housesXmlReader;
 
     /// <summary>
     /// Gets a value indicating whether this instance can read objects.
     /// </summary>
     public bool CanReadObjects { get; private set; } = true;
+
+    public bool CanReadHouses { get; private set; } = true;
 
     /// <summary>
     /// Starts the reader.
@@ -35,6 +38,7 @@ public class ZipXmlReaderService(
     public void StartReader()
     {
         StartObjectsReader();
+        StartHousesReader();
     }
 
     /// <summary>
@@ -52,7 +56,7 @@ public class ZipXmlReaderService(
         {
             CanReadObjects = await _addressXmlReader.ReadAsync();
 
-            if (_addressXmlReader is { NodeType: XmlNodeType.Element, Name: "OBJECT" })
+            if (_addressXmlReader is { NodeType: XmlNodeType.Element, Name: AddressObject.XmlElementName })
             {
                 var isActualAttribute = _addressXmlReader.GetAttribute("ISACTUAL");
                 var isActiveAttribute = _addressXmlReader.GetAttribute("ISACTIVE");
@@ -62,11 +66,42 @@ public class ZipXmlReaderService(
 
                 if (isActual && isActive)
                 {
-                    var objectId = int.Parse(_addressXmlReader.GetAttribute(AddressObject.Names.ObjectId) ?? throw new ArgumentNullException(AddressObject.Names.ObjectId));
-                    var typeName = _addressXmlReader.GetAttribute(AddressObject.Names.TypeName) ?? throw new ArgumentNullException(AddressObject.Names.TypeName);
-                    var name = _addressXmlReader.GetAttribute(AddressObject.Names.Name) ?? throw new ArgumentNullException(AddressObject.Names.Name);
+                    var objectId = int.Parse(_addressXmlReader.GetAttribute(AddressObject.XmlNames.ObjectId) ?? throw new ArgumentNullException(AddressObject.XmlNames.ObjectId));
+                    var typeName = _addressXmlReader.GetAttribute(AddressObject.XmlNames.TypeName) ?? throw new ArgumentNullException(AddressObject.XmlNames.TypeName);
+                    var name = _addressXmlReader.GetAttribute(AddressObject.XmlNames.Name) ?? throw new ArgumentNullException(AddressObject.XmlNames.Name);
 
                     yield return new AddressObject(objectId, typeName, name);
+                }
+            }
+        }
+    }
+
+    public async IAsyncEnumerable<House> ReadHousesAsync()
+    {
+        if (_housesXmlReader is null)
+        {
+            throw new ArgumentNullException(nameof(_housesXmlReader));
+        }
+
+        for (int i = 0; i < _bucketSize; i++)
+        {
+            CanReadHouses = await _housesXmlReader.ReadAsync();
+
+            if (_housesXmlReader is { NodeType: XmlNodeType.Element, Name: House.XmlElementName })
+            {
+                var isActualAttribute = _housesXmlReader.GetAttribute("ISACTUAL");
+                var isActiveAttribute = _housesXmlReader.GetAttribute("ISACTIVE");
+
+                var isActual = string.IsNullOrEmpty(isActualAttribute) || isActualAttribute == "1";
+                var isActive = string.IsNullOrEmpty(isActiveAttribute) || isActiveAttribute == "1";
+
+                if (isActual && isActive)
+                {
+                    var objectId = int.Parse(_housesXmlReader.GetAttribute(House.XmlNames.ObjectId) ?? throw new ArgumentNullException(House.XmlNames.ObjectId));
+                    var houseNum = _housesXmlReader.GetAttribute(House.XmlNames.HouseNum) ?? throw new ArgumentNullException(House.XmlNames.HouseNum);
+                    var houseType = int.Parse(_housesXmlReader.GetAttribute(House.XmlNames.HouseType) ?? throw new ArgumentNullException(House.XmlNames.HouseType));
+
+                    yield return new House(objectId, houseNum, houseType);
                 }
             }
         }
@@ -75,14 +110,29 @@ public class ZipXmlReaderService(
     private void StartObjectsReader()
     {
         var addressEntry = GetAddressEntry();
-        var addressFileStream = addressEntry.Open();
+        var addressStream = addressEntry.Open();
 
-        _addressXmlReader = XmlReader.Create(addressFileStream, new() { Async = true });
+        _addressXmlReader = XmlReader.Create(addressStream, new() { Async = true });
     }
 
     private ZipArchiveEntry GetAddressEntry()
     {
         var regexp = new Regex($@"^{_folderRegion}/AS_ADDR_OBJ_(\d{{8}})_.+\.XML$");
+
+        return _zipArchive.Entries.First(file => regexp.IsMatch(file.FullName));
+    }
+
+    private void StartHousesReader()
+    {
+        var housesEntry = GetHousesEntry();
+        var housesStream = housesEntry.Open();
+
+        _housesXmlReader = XmlReader.Create(housesStream, new() { Async = true });
+    }
+
+    private ZipArchiveEntry GetHousesEntry()
+    {
+        var regexp = new Regex($@"^{_folderRegion}/AS_HOUSES_(\d{{8}})_.+\.XML$");
 
         return _zipArchive.Entries.First(file => regexp.IsMatch(file.FullName));
     }

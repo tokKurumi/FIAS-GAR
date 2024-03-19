@@ -5,7 +5,7 @@
 /// </summary>
 public record AddressObject(
     /// <summary>
-    /// Represents the unique identifier of the object.
+    /// Represents the global unique identifier of the object.
     /// </summary>
     int ObjectId,
 
@@ -20,22 +20,27 @@ public record AddressObject(
     string Name)
 {
     /// <summary>
-    /// Represents the names of the properties in the AddressObject class.
+    /// Represents the XML element name for the object.
     /// </summary>
-    public static class Names
+    public const string XmlElementName = "OBJECT";
+
+    /// <summary>
+    /// Represents the XML element names for the properties in the AddressObject class.
+    /// </summary>
+    public static class XmlNames
     {
         /// <summary>
-        /// Gets the name of the ObjectId property.
+        /// Gets the XML element name for the ObjectId property.
         /// </summary>
         public const string ObjectId = "OBJECTID";
 
         /// <summary>
-        /// Gets the name of the TypeName property.
+        /// Gets the XML element name for the TypeName property.
         /// </summary>
         public const string TypeName = "TYPENAME";
 
         /// <summary>
-        /// Gets the name of the Name property.
+        /// Gets the XML element name for the Name property.
         /// </summary>
         public const string Name = "NAME";
     }

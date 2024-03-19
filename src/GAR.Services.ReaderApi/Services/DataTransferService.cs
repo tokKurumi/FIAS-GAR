@@ -23,5 +23,20 @@ public class DataTransferService(
 
             await Console.Out.WriteLineAsync("<=== END OF BUCKET ===>");
         }
+
+        await Console.Out.WriteLineAsync();
+        await Console.Out.WriteLineAsync();
+        await Console.Out.WriteLineAsync();
+
+        while (_zipXmlReaderService.CanReadHouses)
+        {
+            var bucket = _zipXmlReaderService.ReadHousesAsync();
+            await foreach (var house in bucket)
+            {
+                await Console.Out.WriteLineAsync(house.HouseNum);
+            }
+
+            await Console.Out.WriteLineAsync("<=== END OF BUCKET ===>");
+        }
     }
 }
