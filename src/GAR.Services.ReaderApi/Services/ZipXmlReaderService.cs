@@ -24,13 +24,22 @@ public class ZipXmlReaderService(
 
     private XmlReader? _addressXmlReader;
     private XmlReader? _housesXmlReader;
+    private XmlReader? _apartmentXmlReader;
 
     /// <summary>
     /// Gets a value indicating whether this instance can read objects.
     /// </summary>
     public bool CanReadObjects { get; private set; } = true;
 
+    /// <summary>
+    /// Gets a value indicating whether this instance can read houses.
+    /// </summary>
     public bool CanReadHouses { get; private set; } = true;
+
+    /// <summary>
+    /// Gets a value indicating whether this instance can read apartments.
+    /// </summary>
+    public bool CanReadApartments { get; private set; } = true;
 
     /// <summary>
     /// Starts the reader.
@@ -39,6 +48,7 @@ public class ZipXmlReaderService(
     {
         StartObjectsReader();
         StartHousesReader();
+        StartApartmentsReader();
     }
 
     /// <summary>
@@ -76,6 +86,10 @@ public class ZipXmlReaderService(
         }
     }
 
+    /// <summary>
+    /// Reads the houses asynchronously.
+    /// </summary>
+    /// <returns>An asynchronous enumerable of <see cref="House"/>.</returns>
     public async IAsyncEnumerable<House> ReadHousesAsync()
     {
         if (_housesXmlReader is null)
@@ -107,6 +121,41 @@ public class ZipXmlReaderService(
         }
     }
 
+    /// <summary>
+    /// Reads the apartments asynchronously.
+    /// </summary>
+    /// <returns>An asynchronous enumerable of <see cref="Apartment"/>.</returns>
+    public async IAsyncEnumerable<Apartment> ReadApartmentsAsync()
+    {
+        if (_apartmentXmlReader is null)
+        {
+            throw new ArgumentNullException(nameof(_apartmentXmlReader));
+        }
+
+        for (int i = 0; i < _bucketSize; i++)
+        {
+            CanReadApartments = await _apartmentXmlReader.ReadAsync();
+
+            if (_apartmentXmlReader is { NodeType: XmlNodeType.Element, Name: Apartment.XmlElementName })
+            {
+                var isActualAttribute = _apartmentXmlReader.GetAttribute("ISACTUAL");
+                var isActiveAttribute = _apartmentXmlReader.GetAttribute("ISACTIVE");
+
+                var isActual = string.IsNullOrEmpty(isActualAttribute) || isActualAttribute == "1";
+                var isActive = string.IsNullOrEmpty(isActiveAttribute) || isActiveAttribute == "1";
+
+                if (isActual && isActive)
+                {
+                    var objectId = int.Parse(_apartmentXmlReader.GetAttribute(Apartment.XmlNames.ObjectId) ?? throw new ArgumentNullException(Apartment.XmlNames.ObjectId));
+                    var number = int.Parse(_apartmentXmlReader.GetAttribute(Apartment.XmlNames.Number) ?? throw new ArgumentNullException(Apartment.XmlNames.Number));
+                    var apartType = int.Parse(_apartmentXmlReader.GetAttribute(Apartment.XmlNames.ApartType) ?? throw new ArgumentNullException(Apartment.XmlNames.ApartType));
+
+                    yield return new Apartment(objectId, number, apartType);
+                }
+            }
+        }
+    }
+
     private void StartObjectsReader()
     {
         var addressEntry = GetAddressEntry();
@@ -133,6 +182,21 @@ public class ZipXmlReaderService(
     private ZipArchiveEntry GetHousesEntry()
     {
         var regexp = new Regex($@"^{_folderRegion}/AS_HOUSES_(\d{{8}})_.+\.XML$");
+
+        return _zipArchive.Entries.First(file => regexp.IsMatch(file.FullName));
+    }
+
+    private void StartApartmentsReader()
+    {
+        var apartmentsEntry = GetApartmentsEntry();
+        var apartmentsStream = apartmentsEntry.Open();
+
+        _apartmentXmlReader = XmlReader.Create(apartmentsStream, new() { Async = true });
+    }
+
+    private ZipArchiveEntry GetApartmentsEntry()
+    {
+        var regexp = new Regex($@"^{_folderRegion}/AS_APARTMENTS_(\d{{8}})_.+\.XML$");
 
         return _zipArchive.Entries.First(file => regexp.IsMatch(file.FullName));
     }
