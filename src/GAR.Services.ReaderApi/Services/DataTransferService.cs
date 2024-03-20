@@ -9,13 +9,29 @@ public class DataTransferService(
     : BackgroundService
 {
     private readonly ZipXmlReaderService _zipXmlReaderService = zipXmlReaderService;
+    private bool _disposed;
 
     public override void Dispose()
     {
-        _zipXmlReaderService.Dispose();
+        Dispose(true);
         GC.SuppressFinalize(this);
 
         base.Dispose();
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            _zipXmlReaderService.Dispose();
+        }
+
+        _disposed = true;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -29,70 +45,39 @@ public class DataTransferService(
             var bucket = _zipXmlReaderService.ReadObjectsAsync();
             await foreach (var addressObject in bucket)
             {
-                await Console.Out.WriteLineAsync(addressObject.Name);
             }
-
-            await Console.Out.WriteLineAsync("<=== END OF BUCKET ===>");
         }
-
-        await Console.Out.WriteLineAsync();
-        await Console.Out.WriteLineAsync();
-        await Console.Out.WriteLineAsync();
 
         while (_zipXmlReaderService.CanReadHouses)
         {
             var bucket = _zipXmlReaderService.ReadHousesAsync();
             await foreach (var house in bucket)
             {
-                await Console.Out.WriteLineAsync(house.HouseNum);
             }
-
-            await Console.Out.WriteLineAsync("<=== END OF BUCKET ===>");
         }
-
-        await Console.Out.WriteLineAsync();
-        await Console.Out.WriteLineAsync();
-        await Console.Out.WriteLineAsync();
 
         while (_zipXmlReaderService.CanReadApartments)
         {
             var bucket = _zipXmlReaderService.ReadApartmentsAsync();
             await foreach (var apartment in bucket)
             {
-                await Console.Out.WriteLineAsync(apartment.Number);
             }
-
-            await Console.Out.WriteLineAsync("<=== END OF BUCKET ===>");
         }
-
-        await Console.Out.WriteLineAsync();
-        await Console.Out.WriteLineAsync();
-        await Console.Out.WriteLineAsync();
 
         while (_zipXmlReaderService.CanReadRooms)
         {
             var bucket = _zipXmlReaderService.ReadRoomsAsync();
             await foreach (var room in bucket)
             {
-                await Console.Out.WriteLineAsync(room.Number);
             }
-
-            await Console.Out.WriteLineAsync("<=== END OF BUCKET ===>");
         }
-
-        await Console.Out.WriteLineAsync();
-        await Console.Out.WriteLineAsync();
-        await Console.Out.WriteLineAsync();
 
         while (_zipXmlReaderService.CanReadSteads)
         {
             var bucket = _zipXmlReaderService.ReadSteadsAsync();
             await foreach (var stead in bucket)
             {
-                await Console.Out.WriteLineAsync(stead.Number.ToString());
             }
-
-            await Console.Out.WriteLineAsync("<=== END OF BUCKET ===>");
         }
 
         sw.Stop();
