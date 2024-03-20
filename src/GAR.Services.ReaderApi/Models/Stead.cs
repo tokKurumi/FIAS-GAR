@@ -1,31 +1,26 @@
 ﻿namespace GAR.Services.ReaderApi.Models;
 
 /// <summary>
-/// Represents an apartment.
+/// Represents a stead.
 /// </summary>
-public record Apartment(
+public record Stead(
     /// <summary>
     /// Represents the global unique identifier of the object.
     /// </summary>
     int ObjectId,
 
     /// <summary>
-    /// Represents the number of the apartment.
+    /// Represents the number of the stead.
     /// </summary>
-    string Number,
-
-    /// <summary>
-    /// Represents the type of the apartment.
-    /// </summary>
-    int ApartType)
+    string Number)
 {
     /// <summary>
-    /// Represents the XML element name for the apartment.
+    /// Represents the XML element name for the stead.
     /// </summary>
-    public const string XmlElementName = "APARTMENT";
+    public const string XmlElementName = "STEAD";
 
     /// <summary>
-    /// Contains XML element names for the apartment properties.
+    /// Contains XML element names for the stead properties.
     /// </summary>
     public static class XmlNames
     {
@@ -38,10 +33,5 @@ public record Apartment(
         /// Represents the XML element name for the Number property.
         /// </summary>
         public const string Number = "NUMBER";
-
-        /// <summary>
-        /// Represents the XML element name for the ApartType property.
-        /// </summary>
-        public const string ApartType = "APARTTYPE";
     }
 }

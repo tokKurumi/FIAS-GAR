@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddNpgsqlDataSource("gar-database");
 builder.Services.AddSingleton(provider =>
 {
-    return new ZipXmlReaderService("99", 500);
+    return new ZipXmlReaderService("13", 500);
 });
 builder.Services.AddHostedService<DataTransferService>();
 
