@@ -38,8 +38,6 @@ public class DataTransferService(
     {
         var sw = Stopwatch.StartNew();
 
-        _zipXmlReaderService.StartReader();
-
         while (_zipXmlReaderService.CanReadObjects)
         {
             var bucket = _zipXmlReaderService.ReadObjectsAsync();
@@ -76,6 +74,14 @@ public class DataTransferService(
         {
             var bucket = _zipXmlReaderService.ReadSteadsAsync();
             await foreach (var stead in bucket)
+            {
+            }
+        }
+
+        while (_zipXmlReaderService.CanReadHierarchies)
+        {
+            var bucket = _zipXmlReaderService.ReadHierarchiesAsync();
+            await foreach (var hierarchies in bucket)
             {
             }
         }

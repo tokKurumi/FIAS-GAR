@@ -9,27 +9,51 @@ using GAR.Services.ReaderApi.Models;
 /// <summary>
 /// Provides a service for reading objects from a ZIP file containing XML data.
 /// </summary>
-/// <remarks>
-/// Initializes a new instance of the <see cref="ZipXmlReaderService"/> class.
-/// </remarks>
-/// <param name="folderRegion">The folder region.</param>
-/// <param name="bucketSize">The bucket size.</param>
-public class ZipXmlReaderService(
-    string folderRegion,
-    int bucketSize)
-    : IDisposable
+public class ZipXmlReaderService : IDisposable
 {
-    private readonly string _folderRegion = folderRegion;
-    private readonly int _bucketSize = bucketSize;
+    private readonly string _folderPath;
+    private readonly int _bucketSize;
+
+    private readonly ZipArchive _zipArchive;
+    private readonly Dictionary<string, Regex> _regexes;
+    private readonly Dictionary<string, XmlReader> _readers;
 
     private bool _disposed;
 
-    private ZipArchive? _zipArchive;
-    private XmlReader? _addressesXmlReader;
-    private XmlReader? _housesXmlReader;
-    private XmlReader? _apartmentsXmlReader;
-    private XmlReader? _roomsXmlReader;
-    private XmlReader? _steadsXmlReader;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ZipXmlReaderService"/> class.
+    /// </summary>
+    /// <param name="folderPath">The folder region path.</param>
+    /// <param name="bucketSize">The bucket size.</param>
+    public ZipXmlReaderService(
+        string folderPath,
+        int bucketSize)
+    {
+        _folderPath = folderPath;
+        _bucketSize = bucketSize;
+
+        _zipArchive = ZipFile.OpenRead(@$"Data/gar_xml.zip");
+
+        _regexes = new Dictionary<string, Regex>
+        {
+            [AddressObject.XmlElementName] = new Regex($@"^{folderPath}/AS_ADDR_OBJ_(\d{{8}})_.+\.XML$"),
+            [House.XmlElementName] = new Regex($@"^{_folderPath}/AS_HOUSES_(\d{{8}})_.+\.XML$"),
+            [Apartment.XmlElementName] = new Regex($@"^{_folderPath}/AS_APARTMENTS_(\d{{8}})_.+\.XML$"),
+            [Room.XmlElementName] = new Regex($@"^{_folderPath}/AS_ROOMS_(\d{{8}})_.+\.XML$"),
+            [Stead.XmlElementName] = new Regex($@"^{_folderPath}/AS_STEADS_(\d{{8}})_.+\.XML$"),
+            [Hierarchy.XmlElementName] = new Regex($@"^{_folderPath}/AS_ADM_HIERARCHY_(\d{{8}})_.+\.XML$"),
+        };
+
+        _readers = new Dictionary<string, XmlReader>
+        {
+            [AddressObject.XmlElementName] = CreateAsyncXmlReader(AddressObject.XmlElementName),
+            [House.XmlElementName] = CreateAsyncXmlReader(House.XmlElementName),
+            [Apartment.XmlElementName] = CreateAsyncXmlReader(Apartment.XmlElementName),
+            [Room.XmlElementName] = CreateAsyncXmlReader(Room.XmlElementName),
+            [Stead.XmlElementName] = CreateAsyncXmlReader(Stead.XmlElementName),
+            [Hierarchy.XmlElementName] = CreateAsyncXmlReader(Hierarchy.XmlElementName),
+        };
+    }
 
     /// <summary>
     /// Gets a value indicating whether this instance can read objects.
@@ -57,18 +81,9 @@ public class ZipXmlReaderService(
     public bool CanReadSteads { get; private set; } = true;
 
     /// <summary>
-    /// Starts the reader.
+    /// Gets a value indicating whether this instance can read hierarchies.
     /// </summary>
-    public void StartReader()
-    {
-        _zipArchive = ZipFile.OpenRead(@$"Data/gar_xml.zip");
-
-        StartObjectsReader();
-        StartHousesReader();
-        StartApartmentsReader();
-        StartRoomsReader();
-        StartSteadsReader();
-    }
+    public bool CanReadHierarchies { get; private set; } = true;
 
     /// <summary>
     /// Reads the objects asynchronously.
@@ -76,30 +91,28 @@ public class ZipXmlReaderService(
     /// <returns>An asynchronous enumerable of <see cref="AddressObject"/>.</returns>
     public async IAsyncEnumerable<AddressObject> ReadObjectsAsync()
     {
-        if (_addressesXmlReader is null)
-        {
-            throw new ArgumentNullException(nameof(_addressesXmlReader));
-        }
+        var addressesXmlReader = _readers[AddressObject.XmlElementName];
 
         for (int i = 0; i < _bucketSize; i++)
         {
-            CanReadObjects = await _addressesXmlReader.ReadAsync();
+            CanReadObjects = await addressesXmlReader.ReadAsync();
 
-            if (_addressesXmlReader is { NodeType: XmlNodeType.Element, Name: AddressObject.XmlElementName })
+            if (addressesXmlReader is { NodeType: XmlNodeType.Element, Name: AddressObject.XmlElementName })
             {
-                var isActualAttribute = _addressesXmlReader.GetAttribute("ISACTUAL");
-                var isActiveAttribute = _addressesXmlReader.GetAttribute("ISACTIVE");
+                var isActualAttribute = addressesXmlReader.GetAttribute("ISACTUAL");
+                var isActiveAttribute = addressesXmlReader.GetAttribute("ISACTIVE");
 
                 var isActual = string.IsNullOrEmpty(isActualAttribute) || isActualAttribute == "1";
                 var isActive = string.IsNullOrEmpty(isActiveAttribute) || isActiveAttribute == "1";
 
                 if (isActual && isActive)
                 {
-                    var objectId = int.Parse(_addressesXmlReader.GetAttribute(AddressObject.XmlNames.ObjectId) ?? throw new ArgumentNullException(AddressObject.XmlNames.ObjectId));
-                    var typeName = _addressesXmlReader.GetAttribute(AddressObject.XmlNames.TypeName) ?? throw new ArgumentNullException(AddressObject.XmlNames.TypeName);
-                    var name = _addressesXmlReader.GetAttribute(AddressObject.XmlNames.Name) ?? throw new ArgumentNullException(AddressObject.XmlNames.Name);
+                    var id = int.Parse(addressesXmlReader.GetAttribute(AddressObject.XmlNames.Id) ?? throw new ArgumentNullException(AddressObject.XmlNames.Id));
+                    var objectId = int.Parse(addressesXmlReader.GetAttribute(AddressObject.XmlNames.ObjectId) ?? throw new ArgumentNullException(AddressObject.XmlNames.ObjectId));
+                    var typeName = addressesXmlReader.GetAttribute(AddressObject.XmlNames.TypeName) ?? throw new ArgumentNullException(AddressObject.XmlNames.TypeName);
+                    var name = addressesXmlReader.GetAttribute(AddressObject.XmlNames.Name) ?? throw new ArgumentNullException(AddressObject.XmlNames.Name);
 
-                    yield return new AddressObject(objectId, typeName, name);
+                    yield return new AddressObject(id, objectId, typeName, name);
                 }
             }
         }
@@ -111,30 +124,28 @@ public class ZipXmlReaderService(
     /// <returns>An asynchronous enumerable of <see cref="House"/>.</returns>
     public async IAsyncEnumerable<House> ReadHousesAsync()
     {
-        if (_housesXmlReader is null)
-        {
-            throw new ArgumentNullException(nameof(_housesXmlReader));
-        }
+        var housesXmlReader = _readers[House.XmlElementName];
 
         for (int i = 0; i < _bucketSize; i++)
         {
-            CanReadHouses = await _housesXmlReader.ReadAsync();
+            CanReadHouses = await housesXmlReader.ReadAsync();
 
-            if (_housesXmlReader is { NodeType: XmlNodeType.Element, Name: House.XmlElementName })
+            if (housesXmlReader is { NodeType: XmlNodeType.Element, Name: House.XmlElementName })
             {
-                var isActualAttribute = _housesXmlReader.GetAttribute("ISACTUAL");
-                var isActiveAttribute = _housesXmlReader.GetAttribute("ISACTIVE");
+                var isActualAttribute = housesXmlReader.GetAttribute("ISACTUAL");
+                var isActiveAttribute = housesXmlReader.GetAttribute("ISACTIVE");
 
                 var isActual = string.IsNullOrEmpty(isActualAttribute) || isActualAttribute == "1";
                 var isActive = string.IsNullOrEmpty(isActiveAttribute) || isActiveAttribute == "1";
 
                 if (isActual && isActive)
                 {
-                    var objectId = int.Parse(_housesXmlReader.GetAttribute(House.XmlNames.ObjectId) ?? throw new ArgumentNullException(House.XmlNames.ObjectId));
-                    var houseNum = _housesXmlReader.GetAttribute(House.XmlNames.HouseNum) ?? throw new ArgumentNullException(House.XmlNames.HouseNum);
-                    var houseType = int.Parse(_housesXmlReader.GetAttribute(House.XmlNames.HouseType) ?? throw new ArgumentNullException(House.XmlNames.HouseType));
+                    var id = int.Parse(housesXmlReader.GetAttribute(House.XmlNames.Id) ?? throw new ArgumentNullException(House.XmlNames.Id));
+                    var objectId = int.Parse(housesXmlReader.GetAttribute(House.XmlNames.ObjectId) ?? throw new ArgumentNullException(House.XmlNames.ObjectId));
+                    var houseNum = housesXmlReader.GetAttribute(House.XmlNames.HouseNum) ?? throw new ArgumentNullException(House.XmlNames.HouseNum);
+                    var houseType = int.Parse(housesXmlReader.GetAttribute(House.XmlNames.HouseType) ?? throw new ArgumentNullException(House.XmlNames.HouseType));
 
-                    yield return new House(objectId, houseNum, houseType);
+                    yield return new House(id, objectId, houseNum, houseType);
                 }
             }
         }
@@ -146,30 +157,28 @@ public class ZipXmlReaderService(
     /// <returns>An asynchronous enumerable of <see cref="Apartment"/>.</returns>
     public async IAsyncEnumerable<Apartment> ReadApartmentsAsync()
     {
-        if (_apartmentsXmlReader is null)
-        {
-            throw new ArgumentNullException(nameof(_apartmentsXmlReader));
-        }
+        var apartmentsXmlReader = _readers[Apartment.XmlElementName];
 
         for (int i = 0; i < _bucketSize; i++)
         {
-            CanReadApartments = await _apartmentsXmlReader.ReadAsync();
+            CanReadApartments = await apartmentsXmlReader.ReadAsync();
 
-            if (_apartmentsXmlReader is { NodeType: XmlNodeType.Element, Name: Apartment.XmlElementName })
+            if (apartmentsXmlReader is { NodeType: XmlNodeType.Element, Name: Apartment.XmlElementName })
             {
-                var isActualAttribute = _apartmentsXmlReader.GetAttribute("ISACTUAL");
-                var isActiveAttribute = _apartmentsXmlReader.GetAttribute("ISACTIVE");
+                var isActualAttribute = apartmentsXmlReader.GetAttribute("ISACTUAL");
+                var isActiveAttribute = apartmentsXmlReader.GetAttribute("ISACTIVE");
 
                 var isActual = string.IsNullOrEmpty(isActualAttribute) || isActualAttribute == "1";
                 var isActive = string.IsNullOrEmpty(isActiveAttribute) || isActiveAttribute == "1";
 
                 if (isActual && isActive)
                 {
-                    var objectId = int.Parse(_apartmentsXmlReader.GetAttribute(Apartment.XmlNames.ObjectId) ?? throw new ArgumentNullException(Apartment.XmlNames.ObjectId));
-                    var number = _apartmentsXmlReader.GetAttribute(Apartment.XmlNames.Number) ?? throw new ArgumentNullException(Apartment.XmlNames.Number);
-                    var apartType = int.Parse(_apartmentsXmlReader.GetAttribute(Apartment.XmlNames.ApartType) ?? throw new ArgumentNullException(Apartment.XmlNames.ApartType));
+                    var id = int.Parse(apartmentsXmlReader.GetAttribute(Apartment.XmlNames.Id) ?? throw new ArgumentNullException(Apartment.XmlNames.Id));
+                    var objectId = int.Parse(apartmentsXmlReader.GetAttribute(Apartment.XmlNames.ObjectId) ?? throw new ArgumentNullException(Apartment.XmlNames.ObjectId));
+                    var number = apartmentsXmlReader.GetAttribute(Apartment.XmlNames.Number) ?? throw new ArgumentNullException(Apartment.XmlNames.Number);
+                    var apartType = int.Parse(apartmentsXmlReader.GetAttribute(Apartment.XmlNames.ApartType) ?? throw new ArgumentNullException(Apartment.XmlNames.ApartType));
 
-                    yield return new Apartment(objectId, number, apartType);
+                    yield return new Apartment(id, objectId, number, apartType);
                 }
             }
         }
@@ -181,30 +190,28 @@ public class ZipXmlReaderService(
     /// <returns>An asynchronous enumerable of <see cref="Room"/>.</returns>
     public async IAsyncEnumerable<Room> ReadRoomsAsync()
     {
-        if (_roomsXmlReader is null)
-        {
-            throw new ArgumentNullException(nameof(_roomsXmlReader));
-        }
+        var roomsXmlReader = _readers[Room.XmlElementName];
 
         for (int i = 0; i < _bucketSize; i++)
         {
-            CanReadRooms = await _roomsXmlReader.ReadAsync();
+            CanReadRooms = await roomsXmlReader.ReadAsync();
 
-            if (_roomsXmlReader is { NodeType: XmlNodeType.Element, Name: Room.XmlElementName })
+            if (roomsXmlReader is { NodeType: XmlNodeType.Element, Name: Room.XmlElementName })
             {
-                var isActualAttribute = _roomsXmlReader.GetAttribute("ISACTUAL");
-                var isActiveAttribute = _roomsXmlReader.GetAttribute("ISACTIVE");
+                var isActualAttribute = roomsXmlReader.GetAttribute("ISACTUAL");
+                var isActiveAttribute = roomsXmlReader.GetAttribute("ISACTIVE");
 
                 var isActual = string.IsNullOrEmpty(isActualAttribute) || isActualAttribute == "1";
                 var isActive = string.IsNullOrEmpty(isActiveAttribute) || isActiveAttribute == "1";
 
                 if (isActual && isActive)
                 {
-                    var objectId = int.Parse(_roomsXmlReader.GetAttribute(Room.XmlNames.ObjectId) ?? throw new ArgumentNullException(Room.XmlNames.ObjectId));
-                    var number = _roomsXmlReader.GetAttribute(Room.XmlNames.Number) ?? throw new ArgumentNullException(Room.XmlNames.Number);
-                    var roomType = int.Parse(_roomsXmlReader.GetAttribute(Room.XmlNames.RoomType) ?? throw new ArgumentNullException(Room.XmlNames.RoomType));
+                    var id = int.Parse(roomsXmlReader.GetAttribute(Room.XmlNames.Id) ?? throw new ArgumentNullException(Room.XmlNames.Id));
+                    var objectId = int.Parse(roomsXmlReader.GetAttribute(Room.XmlNames.ObjectId) ?? throw new ArgumentNullException(Room.XmlNames.ObjectId));
+                    var number = roomsXmlReader.GetAttribute(Room.XmlNames.Number) ?? throw new ArgumentNullException(Room.XmlNames.Number);
+                    var roomType = int.Parse(roomsXmlReader.GetAttribute(Room.XmlNames.RoomType) ?? throw new ArgumentNullException(Room.XmlNames.RoomType));
 
-                    yield return new Room(objectId, number, roomType);
+                    yield return new Room(id, objectId, number, roomType);
                 }
             }
         }
@@ -216,29 +223,59 @@ public class ZipXmlReaderService(
     /// <returns>An asynchronous enumerable of <see cref="Stead"/>.</returns>
     public async IAsyncEnumerable<Stead> ReadSteadsAsync()
     {
-        if (_steadsXmlReader is null)
-        {
-            throw new ArgumentNullException(nameof(_steadsXmlReader));
-        }
+        var steadsXmlReader = _readers[Stead.XmlElementName];
 
         for (int i = 0; i < _bucketSize; i++)
         {
-            CanReadSteads = await _steadsXmlReader.ReadAsync();
+            CanReadSteads = await steadsXmlReader.ReadAsync();
 
-            if (_steadsXmlReader is { NodeType: XmlNodeType.Element, Name: Stead.XmlElementName })
+            if (steadsXmlReader is { NodeType: XmlNodeType.Element, Name: Stead.XmlElementName })
             {
-                var isActualAttribute = _steadsXmlReader.GetAttribute("ISACTUAL");
-                var isActiveAttribute = _steadsXmlReader.GetAttribute("ISACTIVE");
+                var isActualAttribute = steadsXmlReader.GetAttribute("ISACTUAL");
+                var isActiveAttribute = steadsXmlReader.GetAttribute("ISACTIVE");
 
                 var isActual = string.IsNullOrEmpty(isActualAttribute) || isActualAttribute == "1";
                 var isActive = string.IsNullOrEmpty(isActiveAttribute) || isActiveAttribute == "1";
 
                 if (isActual && isActive)
                 {
-                    var objectId = int.Parse(_steadsXmlReader.GetAttribute(Stead.XmlNames.ObjectId) ?? throw new ArgumentNullException(Stead.XmlNames.ObjectId));
-                    var number = _steadsXmlReader.GetAttribute(Stead.XmlNames.Number) ?? throw new ArgumentNullException(Stead.XmlNames.Number);
+                    var id = int.Parse(steadsXmlReader.GetAttribute(Stead.XmlNames.Id) ?? throw new ArgumentNullException(Stead.XmlNames.Id));
+                    var objectId = int.Parse(steadsXmlReader.GetAttribute(Stead.XmlNames.ObjectId) ?? throw new ArgumentNullException(Stead.XmlNames.ObjectId));
+                    var number = steadsXmlReader.GetAttribute(Stead.XmlNames.Number) ?? throw new ArgumentNullException(Stead.XmlNames.Number);
 
-                    yield return new Stead(objectId, number);
+                    yield return new Stead(id, objectId, number);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Reads the hierarchies asynchronously.
+    /// </summary>
+    /// <returns>An asynchronous enumerable of <see cref="Hierarchy"/>.</returns>
+    public async IAsyncEnumerable<Hierarchy> ReadHierarchiesAsync()
+    {
+        var hierarchiesXmlReader = _readers[Hierarchy.XmlElementName];
+
+        for (int i = 0; i < _bucketSize; i++)
+        {
+            CanReadHierarchies = await hierarchiesXmlReader.ReadAsync();
+
+            if (hierarchiesXmlReader is { NodeType: XmlNodeType.Element, Name: Hierarchy.XmlElementName })
+            {
+                var isActualAttribute = hierarchiesXmlReader.GetAttribute("ISACTUAL");
+                var isActiveAttribute = hierarchiesXmlReader.GetAttribute("ISACTIVE");
+
+                var isActual = string.IsNullOrEmpty(isActualAttribute) || isActualAttribute == "1";
+                var isActive = string.IsNullOrEmpty(isActiveAttribute) || isActiveAttribute == "1";
+
+                if (isActual && isActive)
+                {
+                    var id = int.Parse(hierarchiesXmlReader.GetAttribute(Hierarchy.XmlNames.Id) ?? throw new ArgumentNullException(Hierarchy.XmlNames.Id));
+                    var objectId = int.Parse(hierarchiesXmlReader.GetAttribute(Hierarchy.XmlNames.ObjectId) ?? throw new ArgumentNullException(Hierarchy.XmlNames.ObjectId));
+                    var path = hierarchiesXmlReader.GetAttribute(Hierarchy.XmlNames.Path) ?? throw new ArgumentNullException(Hierarchy.XmlNames.Path);
+
+                    yield return new Hierarchy(id, objectId, path);
                 }
             }
         }
@@ -260,88 +297,23 @@ public class ZipXmlReaderService(
         if (disposing)
         {
             _zipArchive?.Dispose();
-            _addressesXmlReader?.Dispose();
-            _housesXmlReader?.Dispose();
-            _apartmentsXmlReader?.Dispose();
-            _roomsXmlReader?.Dispose();
-            _steadsXmlReader?.Dispose();
+
+            foreach (var (_, reader) in _readers)
+            {
+                reader?.Dispose();
+            }
         }
 
         _disposed = true;
     }
 
-    private void StartObjectsReader()
+    private XmlReader CreateAsyncXmlReader(string element)
     {
-        var addressEntry = GetAddressEntry();
-        var addressStream = addressEntry.Open();
+        var regex = _regexes[element];
 
-        _addressesXmlReader = XmlReader.Create(addressStream, new() { Async = true });
-    }
+        var archiveEntry = _zipArchive.Entries.First(file => regex.IsMatch(file.FullName));
+        var stream = archiveEntry.Open();
 
-    private ZipArchiveEntry GetAddressEntry()
-    {
-        var regexp = new Regex($@"^{_folderRegion}/AS_ADDR_OBJ_(\d{{8}})_.+\.XML$");
-
-        return _zipArchive!.Entries.First(file => regexp.IsMatch(file.FullName));
-    }
-
-    private void StartHousesReader()
-    {
-        var housesEntry = GetHousesEntry();
-        var housesStream = housesEntry.Open();
-
-        _housesXmlReader = XmlReader.Create(housesStream, new() { Async = true });
-    }
-
-    private ZipArchiveEntry GetHousesEntry()
-    {
-        var regexp = new Regex($@"^{_folderRegion}/AS_HOUSES_(\d{{8}})_.+\.XML$");
-
-        return _zipArchive!.Entries.First(file => regexp.IsMatch(file.FullName));
-    }
-
-    private void StartApartmentsReader()
-    {
-        var apartmentsEntry = GetApartmentsEntry();
-        var apartmentsStream = apartmentsEntry.Open();
-
-        _apartmentsXmlReader = XmlReader.Create(apartmentsStream, new() { Async = true });
-    }
-
-    private ZipArchiveEntry GetApartmentsEntry()
-    {
-        var regexp = new Regex($@"^{_folderRegion}/AS_APARTMENTS_(\d{{8}})_.+\.XML$");
-
-        return _zipArchive!.Entries.First(file => regexp.IsMatch(file.FullName));
-    }
-
-    private void StartRoomsReader()
-    {
-        var roomsEntry = GetRoomsEntry();
-        var roomsStream = roomsEntry.Open();
-
-        _roomsXmlReader = XmlReader.Create(roomsStream, new() { Async = true });
-    }
-
-    private ZipArchiveEntry GetRoomsEntry()
-    {
-        var regexp = new Regex($@"^{_folderRegion}/AS_ROOMS_(\d{{8}})_.+\.XML$");
-
-        return _zipArchive!.Entries.First(file => regexp.IsMatch(file.FullName));
-    }
-
-    private void StartSteadsReader()
-    {
-        var steadsEntry = GetSteadsEntry();
-        var steadsStream = steadsEntry.Open();
-
-        _steadsXmlReader = XmlReader.Create(steadsStream, new() { Async = true });
-    }
-
-    private ZipArchiveEntry GetSteadsEntry()
-    {
-        var regexp = new Regex($@"^{_folderRegion}/AS_STEADS_(\d{{8}})_.+\.XML$");
-
-        return _zipArchive!.Entries.First(file => regexp.IsMatch(file.FullName));
+        return XmlReader.Create(stream, new XmlReaderSettings { Async = true });
     }
 }

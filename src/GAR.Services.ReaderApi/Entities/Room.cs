@@ -5,6 +5,11 @@
 /// </summary>
 public record Room(
     /// <summary>
+    /// Represents the identifier of the room.
+    /// </summary>
+    int Id,
+
+    /// <summary>
     /// Represents the global unique identifier of the object.
     /// </summary>
     int ObjectId,
@@ -29,6 +34,11 @@ public record Room(
     /// </summary>
     public static class XmlNames
     {
+        /// <summary>
+        /// Gets the XML element name for the Id property.
+        /// </summary>
+        public const string Id = "ID";
+
         /// <summary>
         /// Represents the XML element name for the ObjectId property.
         /// </summary>

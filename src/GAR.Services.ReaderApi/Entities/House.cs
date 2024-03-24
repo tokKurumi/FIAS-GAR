@@ -5,6 +5,11 @@
 /// </summary>
 public record House(
     /// <summary>
+    /// Represents the identifier of the house.
+    /// </summary>
+    int Id,
+
+    /// <summary>
     /// Represents the global unique identifier of the object.
     /// </summary>
     int ObjectId,
@@ -29,6 +34,11 @@ public record House(
     /// </summary>
     public static class XmlNames
     {
+        /// <summary>
+        /// Gets the XML element name for the Id property.
+        /// </summary>
+        public const string Id = "ID";
+
         /// <summary>
         /// The XML name of the ObjectId property.
         /// </summary>
