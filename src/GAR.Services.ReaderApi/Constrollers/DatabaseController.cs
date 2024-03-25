@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 [ApiVersion(1.0)]
 [Route("v{version:apiVersion}/[controller]")]
 public class DatabaseController(
-    DatabaseInitializerService databaseInitializerService)
+    DatabaseInitializerService databaseInitializerService,
+    DataTransferService dataTransferService)
     : ControllerBase
 {
     private readonly DatabaseInitializerService _databaseInitializerService = databaseInitializerService;
+    private readonly DataTransferService _dataTransferService = dataTransferService;
 
-    [HttpPost("initialize")]
+    [HttpPost]
     public async Task<IActionResult> InitializeAsync(CancellationToken cancellationToken)
     {
         await _databaseInitializerService.InitializeAsync(cancellationToken);
@@ -21,10 +23,18 @@ public class DatabaseController(
         return Ok();
     }
 
-    [HttpPost("insertObjects")]
+    [HttpDelete]
+    public async Task<IActionResult> DeleteAsync(CancellationToken cancellationToken)
+    {
+        await _databaseInitializerService.DropSchemaAsync(cancellationToken);
+
+        return Ok();
+    }
+
+    [HttpPost("objects")]
     public async Task<IActionResult> InsertObjectsAsync(CancellationToken cancellationToken)
     {
-        await _databaseInitializerService.InitializeAsync(cancellationToken);
+        await _dataTransferService.InsertObjectsAsync(cancellationToken);
 
         return Ok();
     }

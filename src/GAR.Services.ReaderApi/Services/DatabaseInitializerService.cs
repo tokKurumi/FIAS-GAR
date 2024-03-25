@@ -16,6 +16,14 @@ public class DatabaseInitializerService(
 
     private bool _disposed;
 
+    public async Task DropSchemaAsync(CancellationToken cancellationToken = default)
+    {
+        await using var cmd = _dataSource.CreateCommand(@"DROP SCHEMA IF EXISTS public CASCADE;");
+
+        await cmd.ExecuteNonQueryAsync(cancellationToken);
+        _logger.LogInformation("Schema was dropped.");
+    }
+
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         var cw = Stopwatch.StartNew();
