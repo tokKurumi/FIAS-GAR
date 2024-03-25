@@ -9,19 +9,32 @@ using Npgsql;
 public class DatabaseInitializerService(
     NpgsqlDataSource dataSource,
     ILogger<DatabaseInitializerService> logger)
-    : BackgroundService
+    : IDisposable
 {
     private readonly NpgsqlDataSource _dataSource = dataSource;
     private readonly ILogger<DatabaseInitializerService> _logger = logger;
 
     private bool _disposed;
 
-    public override void Dispose()
+    public async Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        var cw = Stopwatch.StartNew();
+
+        await CreateSchemaAsync(cancellationToken);
+        await CreateAddressesTableAsync(cancellationToken);
+        await CreateApartmentsTableAsync(cancellationToken);
+        await CreateHierarchiesTableAsync(cancellationToken);
+        await CreateHousesTableAsync(cancellationToken);
+        await CreateRoomsTableAsync(cancellationToken);
+        await CreateSteadsTableAsync(cancellationToken);
+
+        _logger.LogInformation("Database initialization has ended in {Milliseconds}ms", cw.ElapsedMilliseconds);
+    }
+
+    public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
-
-        base.Dispose();
     }
 
     protected virtual void Dispose(bool disposing)
@@ -37,21 +50,6 @@ public class DatabaseInitializerService(
         }
 
         _disposed = true;
-    }
-
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        var cw = Stopwatch.StartNew();
-
-        await CreateSchemaAsync(stoppingToken);
-        await CreateAddressesTableAsync(stoppingToken);
-        await CreateApartmentsTableAsync(stoppingToken);
-        await CreateHierarchiesTableAsync(stoppingToken);
-        await CreateHousesTableAsync(stoppingToken);
-        await CreateRoomsTableAsync(stoppingToken);
-        await CreateSteadsTableAsync(stoppingToken);
-
-        _logger.LogInformation("Database initialization has ended in {Milliseconds}ms", cw.ElapsedMilliseconds);
     }
 
     private async Task CreateSchemaAsync(CancellationToken cancellationToken = default)

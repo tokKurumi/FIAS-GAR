@@ -7,21 +7,34 @@ using System.Threading.Tasks;
 public class DataTransferService(
     ILogger<DataTransferService> logger,
     ZipXmlReaderService zipXmlReaderService,
-    IServiceScopeFactory serviceScopeFactory)
-    : BackgroundService
+    DataWriterService dataWriterService)
+    : IDisposable
 {
     private readonly ILogger<DataTransferService> _logger = logger;
     private readonly ZipXmlReaderService _zipXmlReaderService = zipXmlReaderService;
-    private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+    private readonly DataWriterService _dataWriterService = dataWriterService;
 
     private bool _disposed;
 
-    public override void Dispose()
+    public async Task InsertObjectsAsync(CancellationToken cancellationToken = default)
+    {
+        var sw = Stopwatch.StartNew();
+
+        while (_zipXmlReaderService.CanReadObjects)
+        {
+            var bucket = _zipXmlReaderService.ReadObjectsAsync();
+            var saved = await _dataWriterService.ImportObjects(bucket, cancellationToken);
+
+            _logger.LogInformation("Objects saved from bucket: {Saved}", saved);
+        }
+
+        _logger.LogInformation("Objects copying has ended in {Milliseconds}", sw.ElapsedMilliseconds);
+    }
+
+    public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
-
-        base.Dispose();
     }
 
     protected virtual void Dispose(bool disposing)
@@ -37,26 +50,5 @@ public class DataTransferService(
         }
 
         _disposed = true;
-    }
-
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        using var scope = _serviceScopeFactory.CreateScope();
-        var postgresDataWriterService = scope.ServiceProvider.GetRequiredService<DataWriterService>();
-
-        await InsertObjectsAsync(postgresDataWriterService, stoppingToken);
-    }
-
-    private async Task InsertObjectsAsync(DataWriterService dataWriterService, CancellationToken cancelationToken = default)
-    {
-        var sw = Stopwatch.StartNew();
-
-        while (_zipXmlReaderService.CanReadObjects)
-        {
-            var bucket = _zipXmlReaderService.ReadObjectsAsync();
-            await dataWriterService.ImportObjects(bucket, cancelationToken);
-        }
-
-        _logger.LogInformation("Done in {Milliseconds}", sw.ElapsedMilliseconds);
     }
 }
