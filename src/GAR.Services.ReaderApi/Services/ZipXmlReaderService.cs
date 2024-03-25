@@ -9,7 +9,7 @@ using GAR.Services.ReaderApi.Models;
 /// <summary>
 /// Provides a service for reading objects from a ZIP file containing XML data.
 /// </summary>
-public class ZipXmlReaderService : IDisposable
+public partial class ZipXmlReaderService : IDisposable
 {
     private readonly string _folderPath;
     private readonly int _bucketSize;
@@ -17,6 +17,8 @@ public class ZipXmlReaderService : IDisposable
     private readonly ZipArchive _zipArchive;
     private readonly Dictionary<string, Regex> _regexes;
     private readonly Dictionary<string, XmlReader> _readers;
+
+    private IEnumerable<AddressObjectType> _addressObjectTypes;
 
     private bool _disposed;
 
@@ -36,6 +38,11 @@ public class ZipXmlReaderService : IDisposable
 
         _regexes = new Dictionary<string, Regex>
         {
+            [AddressObjectType.XmlElementName] = AddressObjectTypeRegex(),
+            [HouseType.XmlElementName] = HouseTypeRegex(),
+            [ApartmentType.XmlElementName] = ApartmentTypeRegex(),
+            [RoomType.XmlElementName] = RoomTypeRegex(),
+
             [AddressObject.XmlElementName] = new Regex($@"^{folderPath}/AS_ADDR_OBJ_(\d{{8}})_.+\.XML$"),
             [House.XmlElementName] = new Regex($@"^{_folderPath}/AS_HOUSES_(\d{{8}})_.+\.XML$"),
             [Apartment.XmlElementName] = new Regex($@"^{_folderPath}/AS_APARTMENTS_(\d{{8}})_.+\.XML$"),
@@ -46,6 +53,11 @@ public class ZipXmlReaderService : IDisposable
 
         _readers = new Dictionary<string, XmlReader>
         {
+            [AddressObjectType.XmlElementName] = CreateAsyncXmlReader(AddressObjectType.XmlElementName),
+            [HouseType.XmlElementName] = CreateAsyncXmlReader(HouseType.XmlElementName),
+            [ApartmentType.XmlElementName] = CreateAsyncXmlReader(ApartmentType.XmlElementName),
+            [RoomType.XmlElementName] = CreateAsyncXmlReader(RoomType.XmlElementName),
+
             [AddressObject.XmlElementName] = CreateAsyncXmlReader(AddressObject.XmlElementName),
             [House.XmlElementName] = CreateAsyncXmlReader(House.XmlElementName),
             [Apartment.XmlElementName] = CreateAsyncXmlReader(Apartment.XmlElementName),
@@ -85,6 +97,14 @@ public class ZipXmlReaderService : IDisposable
     /// </summary>
     public bool CanReadHierarchies { get; private set; } = true;
 
+    private bool CanReadAddressObjectTypes { get; set; } = true;
+
+    private bool CanReadHouseTypes { get; set; } = true;
+
+    private bool CanReadApartmentTypes { get; set; } = true;
+
+    private bool CanReadRoomTypes { get; set; } = true;
+
     /// <summary>
     /// Reads the objects asynchronously.
     /// </summary>
@@ -93,7 +113,7 @@ public class ZipXmlReaderService : IDisposable
     {
         var addressesXmlReader = _readers[AddressObject.XmlElementName];
 
-        for (int i = 0; i < _bucketSize; i++)
+        for (int i = 0; i < _bucketSize && CanReadObjects; i++)
         {
             CanReadObjects = await addressesXmlReader.ReadAsync();
 
@@ -126,7 +146,7 @@ public class ZipXmlReaderService : IDisposable
     {
         var housesXmlReader = _readers[House.XmlElementName];
 
-        for (int i = 0; i < _bucketSize; i++)
+        for (int i = 0; i < _bucketSize && CanReadHouses; i++)
         {
             CanReadHouses = await housesXmlReader.ReadAsync();
 
@@ -159,7 +179,7 @@ public class ZipXmlReaderService : IDisposable
     {
         var apartmentsXmlReader = _readers[Apartment.XmlElementName];
 
-        for (int i = 0; i < _bucketSize; i++)
+        for (int i = 0; i < _bucketSize && CanReadApartments; i++)
         {
             CanReadApartments = await apartmentsXmlReader.ReadAsync();
 
@@ -192,7 +212,7 @@ public class ZipXmlReaderService : IDisposable
     {
         var roomsXmlReader = _readers[Room.XmlElementName];
 
-        for (int i = 0; i < _bucketSize; i++)
+        for (int i = 0; i < _bucketSize && CanReadRooms; i++)
         {
             CanReadRooms = await roomsXmlReader.ReadAsync();
 
@@ -225,7 +245,7 @@ public class ZipXmlReaderService : IDisposable
     {
         var steadsXmlReader = _readers[Stead.XmlElementName];
 
-        for (int i = 0; i < _bucketSize; i++)
+        for (int i = 0; i < _bucketSize && CanReadSteads; i++)
         {
             CanReadSteads = await steadsXmlReader.ReadAsync();
 
@@ -257,7 +277,7 @@ public class ZipXmlReaderService : IDisposable
     {
         var hierarchiesXmlReader = _readers[Hierarchy.XmlElementName];
 
-        for (int i = 0; i < _bucketSize; i++)
+        for (int i = 0; i < _bucketSize && CanReadHierarchies; i++)
         {
             CanReadHierarchies = await hierarchiesXmlReader.ReadAsync();
 
@@ -307,6 +327,18 @@ public class ZipXmlReaderService : IDisposable
         _disposed = true;
     }
 
+    [GeneratedRegex(@"^AS_ADDR_OBJ_TYPES_(\d{8})_.+\.XML$")]
+    private static partial Regex AddressObjectTypeRegex();
+
+    [GeneratedRegex(@"^AS_HOUSE_TYPES_(\d{8})_.+\.XML$")]
+    private static partial Regex HouseTypeRegex();
+
+    [GeneratedRegex(@"^AS_APARTMENT_TYPES_(\d{8})_.+\.XML$")]
+    private static partial Regex ApartmentTypeRegex();
+
+    [GeneratedRegex(@"^AS_ROOM_TYPES_(\d{8})_.+\.XML$")]
+    private static partial Regex RoomTypeRegex();
+
     private XmlReader CreateAsyncXmlReader(string element)
     {
         var regex = _regexes[element];
@@ -315,5 +347,27 @@ public class ZipXmlReaderService : IDisposable
         var stream = archiveEntry.Open();
 
         return XmlReader.Create(stream, new XmlReaderSettings { Async = true });
+    }
+
+    private async Task InitTypes()
+    {
+    }
+
+    private async IAsyncEnumerable<AddressObjectType> ReadAddressObjectType()
+    {
+        var addressObjectTypesXmlReader = _readers[AddressObjectType.XmlElementName];
+
+        for (int i = 0; i < _bucketSize; i++)
+        {
+            CanReadAddressObjectTypes = await addressObjectTypesXmlReader.ReadAsync();
+
+            if (addressObjectTypesXmlReader is { NodeType: XmlNodeType.Element, Name: AddressObjectType.XmlElementName })
+            {
+                var shortName = addressObjectTypesXmlReader.GetAttribute(AddressObjectType.XmlNames.ShortName) ?? throw new ArgumentNullException(AddressObjectType.XmlNames.ShortName);
+                var name = addressObjectTypesXmlReader.GetAttribute(AddressObjectType.XmlNames.Name) ?? throw new ArgumentNullException(AddressObjectType.XmlNames.Name);
+
+                yield return new AddressObjectType(shortName, name);
+            }
+        }
     }
 }

@@ -33,7 +33,7 @@ public record AddressObject(
     /// <summary>
     /// Represents the name of the table entity for the AddressObject class.
     /// </summary>
-    public const string TableEntityName = "Objects";
+    public const string TableEntityName = "AddressObjects";
 
     /// <summary>
     /// Represents the XML element names for the properties in the AddressObject class.
