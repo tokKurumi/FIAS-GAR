@@ -103,7 +103,7 @@ public class DatabaseInitializerService(
         await using var cmd = _dataSource.CreateCommand($"""
             CREATE TABLE IF NOT EXISTS public."{Hierarchy.TableEntityName}" (
                 "{nameof(Hierarchy.Id)}" SERIAL PRIMARY KEY,
-                "{nameof(Hierarchy.ObjectId)}" text NOT NULL,
+                "{nameof(Hierarchy.ObjectId)}" integer NOT NULL,
                 "{nameof(Hierarchy.Path)}" text NOT NULL
            );
         """);

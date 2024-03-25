@@ -296,11 +296,11 @@ public class ZipXmlReaderService : IDisposable
 
         if (disposing)
         {
-            _zipArchive?.Dispose();
+            _zipArchive.Dispose();
 
             foreach (var (_, reader) in _readers)
             {
-                reader?.Dispose();
+                reader.Dispose();
             }
         }
 

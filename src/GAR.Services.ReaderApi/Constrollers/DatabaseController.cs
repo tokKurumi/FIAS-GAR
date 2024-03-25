@@ -31,10 +31,10 @@ public class DatabaseController(
         return Ok();
     }
 
-    [HttpPost("objects")]
-    public async Task<IActionResult> InsertObjectsAsync(CancellationToken cancellationToken)
+    [HttpPost("import")]
+    public async Task<IActionResult> ImportAsync(CancellationToken cancellationToken)
     {
-        await _dataTransferService.InsertObjectsAsync(cancellationToken);
+        await _dataTransferService.ImportAsync(cancellationToken);
 
         return Ok();
     }
