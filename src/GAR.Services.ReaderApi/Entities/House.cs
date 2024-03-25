@@ -31,6 +31,11 @@ public record House(
     public const string XmlElementName = "HOUSE";
 
     /// <summary>
+    /// The name of the table entity for the house.
+    /// </summary>
+    public const string TableEntityName = "Houses";
+
+    /// <summary>
     /// Provides the XML names of the properties.
     /// </summary>
     public static class XmlNames

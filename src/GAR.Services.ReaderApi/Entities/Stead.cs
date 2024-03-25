@@ -26,6 +26,11 @@ public record Stead(
     public const string XmlElementName = "STEAD";
 
     /// <summary>
+    /// Represents the table entity name for the stead.
+    /// </summary>
+    public const string TableEntityName = "Steads";
+
+    /// <summary>
     /// Contains XML element names for the stead properties.
     /// </summary>
     public static class XmlNames

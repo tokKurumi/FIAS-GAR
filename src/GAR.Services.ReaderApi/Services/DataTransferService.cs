@@ -42,12 +42,12 @@ public class DataTransferService(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var scope = _serviceScopeFactory.CreateScope();
-        var postgresDataWriterService = scope.ServiceProvider.GetRequiredService<PostgresDataWriterService>();
+        var postgresDataWriterService = scope.ServiceProvider.GetRequiredService<DataWriterService>();
 
         await InsertObjectsAsync(postgresDataWriterService, stoppingToken);
     }
 
-    private async Task InsertObjectsAsync(PostgresDataWriterService dataWriterService, CancellationToken cancelationToken = default)
+    private async Task InsertObjectsAsync(DataWriterService dataWriterService, CancellationToken cancelationToken = default)
     {
         var sw = Stopwatch.StartNew();
 

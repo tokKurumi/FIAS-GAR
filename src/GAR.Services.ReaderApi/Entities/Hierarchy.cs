@@ -26,6 +26,11 @@ public record Hierarchy(
     public const string XmlElementName = "ITEM";
 
     /// <summary>
+    /// Represents the name of the table entity for the hierarchy.
+    /// </summary>
+    public const string TableEntityName = "Hierarchies";
+
+    /// <summary>
     /// Represents the XML attribute name for the object ID.
     /// </summary>
     public static class XmlNames

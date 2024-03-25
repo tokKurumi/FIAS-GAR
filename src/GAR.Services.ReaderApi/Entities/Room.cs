@@ -31,6 +31,11 @@ public record Room(
     public const string XmlElementName = "ROOM";
 
     /// <summary>
+    /// Represents the name of the table entity for the room.
+    /// </summary>
+    public const string TableEntityName = "Rooms";
+
+    /// <summary>
     /// Contains XML element names for the room properties.
     /// </summary>
     public static class XmlNames
