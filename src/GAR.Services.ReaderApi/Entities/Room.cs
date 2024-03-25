@@ -4,6 +4,7 @@
 /// Represents a room.
 /// </summary>
 public record Room(
+
     /// <summary>
     /// Represents the identifier of the room.
     /// </summary>

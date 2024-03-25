@@ -1,14 +1,10 @@
 ﻿namespace GAR.Services.ReaderApi.Services;
 
-using GAR.Services.ReaderApi.Data;
+using GAR.Services.ReaderApi.Models;
 
-public class PostgresDataWriterService(
-     GarDbContext dbContext)
+public class PostgresDataWriterService
 {
-    private readonly GarDbContext _dbContext = dbContext;
-
-    public Task BulkInsert<T>(IEnumerable<T> values, string table)
+    public async Task ImportObjects(IAsyncEnumerable<AddressObject> addressObjects, CancellationToken cancellationToken = default)
     {
-        return Task.CompletedTask;
     }
 }

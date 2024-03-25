@@ -4,6 +4,7 @@
 /// Represents a stead.
 /// </summary>
 public record Stead(
+
     /// <summary>
     /// Represents the identifier of the stead.
     /// </summary>

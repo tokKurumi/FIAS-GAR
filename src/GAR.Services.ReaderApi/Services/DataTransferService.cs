@@ -5,10 +5,15 @@ using System.Threading;
 using System.Threading.Tasks;
 
 public class DataTransferService(
-    ZipXmlReaderService zipXmlReaderService)
+    ILogger<DataTransferService> logger,
+    ZipXmlReaderService zipXmlReaderService,
+    IServiceScopeFactory serviceScopeFactory)
     : BackgroundService
 {
+    private readonly ILogger<DataTransferService> _logger = logger;
     private readonly ZipXmlReaderService _zipXmlReaderService = zipXmlReaderService;
+    private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+
     private bool _disposed;
 
     public override void Dispose()
@@ -36,57 +41,22 @@ public class DataTransferService(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        using var scope = _serviceScopeFactory.CreateScope();
+        var postgresDataWriterService = scope.ServiceProvider.GetRequiredService<PostgresDataWriterService>();
+
+        await InsertObjectsAsync(postgresDataWriterService, stoppingToken);
+    }
+
+    private async Task InsertObjectsAsync(PostgresDataWriterService dataWriterService, CancellationToken cancelationToken = default)
+    {
         var sw = Stopwatch.StartNew();
 
         while (_zipXmlReaderService.CanReadObjects)
         {
             var bucket = _zipXmlReaderService.ReadObjectsAsync();
-            await foreach (var addressObject in bucket)
-            {
-            }
+            await dataWriterService.ImportObjects(bucket, cancelationToken);
         }
 
-        while (_zipXmlReaderService.CanReadHouses)
-        {
-            var bucket = _zipXmlReaderService.ReadHousesAsync();
-            await foreach (var house in bucket)
-            {
-            }
-        }
-
-        while (_zipXmlReaderService.CanReadApartments)
-        {
-            var bucket = _zipXmlReaderService.ReadApartmentsAsync();
-            await foreach (var apartment in bucket)
-            {
-            }
-        }
-
-        while (_zipXmlReaderService.CanReadRooms)
-        {
-            var bucket = _zipXmlReaderService.ReadRoomsAsync();
-            await foreach (var room in bucket)
-            {
-            }
-        }
-
-        while (_zipXmlReaderService.CanReadSteads)
-        {
-            var bucket = _zipXmlReaderService.ReadSteadsAsync();
-            await foreach (var stead in bucket)
-            {
-            }
-        }
-
-        while (_zipXmlReaderService.CanReadHierarchies)
-        {
-            var bucket = _zipXmlReaderService.ReadHierarchiesAsync();
-            await foreach (var hierarchies in bucket)
-            {
-            }
-        }
-
-        sw.Stop();
-        await Console.Out.WriteLineAsync($"Done in {sw.ElapsedMilliseconds}");
+        _logger.LogInformation("Done in {Milliseconds}", sw.ElapsedMilliseconds);
     }
 }

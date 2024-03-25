@@ -4,6 +4,7 @@
 /// Represents an address object.
 /// </summary>
 public record AddressObject(
+
     /// <summary>
     /// Represents the identifier of the address.
     /// </summary>

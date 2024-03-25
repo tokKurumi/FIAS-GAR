@@ -4,6 +4,7 @@
 /// Represents an apartment.
 /// </summary>
 public record Apartment(
+
     /// <summary>
     /// Represents the identifier of the apartment.
     /// </summary>

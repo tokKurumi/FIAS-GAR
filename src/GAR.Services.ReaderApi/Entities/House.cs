@@ -4,6 +4,7 @@
 /// Represents a house.
 /// </summary>
 public record House(
+
     /// <summary>
     /// Represents the identifier of the house.
     /// </summary>

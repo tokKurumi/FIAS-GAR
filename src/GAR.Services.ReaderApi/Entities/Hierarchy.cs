@@ -4,6 +4,7 @@
 /// Represents a hierarchy item.
 /// </summary>
 public record Hierarchy(
+
     /// <summary>
     /// Represents the identifier of the hierarchy.
     /// </summary>
