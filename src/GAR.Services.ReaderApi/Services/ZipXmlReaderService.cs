@@ -142,7 +142,7 @@ public partial class ZipXmlReaderService : IDisposable
 
         for (int i = 0; i < _bucketSize && CanReadObjects; i++)
         {
-            CanReadObjects = await addressesXmlReader.ReadAsync();
+            CanReadObjects = await addressesXmlReader.ReadAsync().ConfigureAwait(false);
 
             if (addressesXmlReader is { NodeType: XmlNodeType.Element, Name: AddressObject.XmlElementName })
             {
@@ -183,7 +183,7 @@ public partial class ZipXmlReaderService : IDisposable
 
         for (int i = 0; i < _bucketSize && CanReadHouses; i++)
         {
-            CanReadHouses = await housesXmlReader.ReadAsync();
+            CanReadHouses = await housesXmlReader.ReadAsync().ConfigureAwait(false);
 
             if (housesXmlReader is { NodeType: XmlNodeType.Element, Name: House.XmlElementName })
             {
@@ -224,7 +224,7 @@ public partial class ZipXmlReaderService : IDisposable
 
         for (int i = 0; i < _bucketSize && CanReadApartments; i++)
         {
-            CanReadApartments = await apartmentsXmlReader.ReadAsync();
+            CanReadApartments = await apartmentsXmlReader.ReadAsync().ConfigureAwait(false);
 
             if (apartmentsXmlReader is { NodeType: XmlNodeType.Element, Name: Apartment.XmlElementName })
             {
@@ -265,7 +265,7 @@ public partial class ZipXmlReaderService : IDisposable
 
         for (int i = 0; i < _bucketSize && CanReadRooms; i++)
         {
-            CanReadRooms = await roomsXmlReader.ReadAsync();
+            CanReadRooms = await roomsXmlReader.ReadAsync().ConfigureAwait(false);
 
             if (roomsXmlReader is { NodeType: XmlNodeType.Element, Name: Room.XmlElementName })
             {
@@ -305,7 +305,7 @@ public partial class ZipXmlReaderService : IDisposable
 
         for (int i = 0; i < _bucketSize && CanReadSteads; i++)
         {
-            CanReadSteads = await steadsXmlReader.ReadAsync();
+            CanReadSteads = await steadsXmlReader.ReadAsync().ConfigureAwait(false);
 
             if (steadsXmlReader is { NodeType: XmlNodeType.Element, Name: Stead.XmlElementName })
             {
@@ -333,7 +333,7 @@ public partial class ZipXmlReaderService : IDisposable
 
         for (int i = 0; i < _bucketSize && CanReadHierarchies; i++)
         {
-            CanReadHierarchies = await hierarchiesXmlReader.ReadAsync();
+            CanReadHierarchies = await hierarchiesXmlReader.ReadAsync().ConfigureAwait(false);
 
             if (hierarchiesXmlReader is { NodeType: XmlNodeType.Element, Name: Hierarchy.XmlElementName })
             {
