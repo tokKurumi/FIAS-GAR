@@ -16,14 +16,9 @@ public record AddressObject(
     int ObjectId,
 
     /// <summary>
-    /// Represents the type name of the address.
+    /// Represents the full name of the address.
     /// </summary>
-    string TypeName,
-
-    /// <summary>
-    /// Represents the name of the address.
-    /// </summary>
-    string Name)
+    string FullName)
 {
     /// <summary>
     /// Represents the XML element name for the address.

@@ -76,8 +76,7 @@ public class DatabaseInitializerService(
             CREATE TABLE IF NOT EXISTS public."{AddressObject.TableEntityName}" (
                 "{nameof(AddressObject.Id)}" SERIAL PRIMARY KEY,
                 "{nameof(AddressObject.ObjectId)}" integer NOT NULL,
-                "{nameof(AddressObject.TypeName)}" text NOT NULL,
-                "{nameof(AddressObject.Name)}" text NOT NULL
+                "{nameof(AddressObject.FullName)}" text NOT NULL
             );
         """);
 
@@ -90,8 +89,7 @@ public class DatabaseInitializerService(
             CREATE TABLE IF NOT EXISTS public."{Apartment.TableEntityName}" (
                 "{nameof(Apartment.Id)}" SERIAL PRIMARY KEY,
                 "{nameof(Apartment.ObjectId)}" integer NOT NULL,
-                "{nameof(Apartment.Number)}" text NOT NULL,
-                "{nameof(Apartment.ApartType)}" integer NOT NULL
+                "{nameof(Apartment.FullName)}" text NOT NULL
             );
         """);
 
@@ -117,8 +115,7 @@ public class DatabaseInitializerService(
             CREATE TABLE IF NOT EXISTS public."{House.TableEntityName}" (
                 "{nameof(House.Id)}" SERIAL PRIMARY KEY,
                 "{nameof(House.ObjectId)}" integer NOT NULL,
-                "{nameof(House.HouseNum)}" text NOT NULL,
-                "{nameof(House.HouseType)}" integer NOT NULL
+                "{nameof(House.FullName)}" text NOT NULL
             );
         """);
 
@@ -131,8 +128,7 @@ public class DatabaseInitializerService(
             CREATE TABLE IF NOT EXISTS public."{Room.TableEntityName}" (
                 "{nameof(Room.Id)}" SERIAL PRIMARY KEY,
                 "{nameof(Room.ObjectId)}" integer NOT NULL,
-                "{nameof(Room.Number)}" text NOT NULL,
-                "{nameof(Room.RoomType)}" integer NOT NULL
+                "{nameof(Room.FullName)}" text NOT NULL
             );
         """);
 
@@ -145,7 +141,7 @@ public class DatabaseInitializerService(
             CREATE TABLE IF NOT EXISTS public."{Stead.TableEntityName}" (
                 "{nameof(Stead.Id)}" SERIAL PRIMARY KEY,
                 "{nameof(Stead.ObjectId)}" integer NOT NULL,
-                "{nameof(Stead.Number)}" text NOT NULL
+                "{nameof(Stead.FullName)}" text NOT NULL
             );
         """);
 

@@ -16,14 +16,9 @@ public record Room(
     int ObjectId,
 
     /// <summary>
-    /// Represents the number of the room.
+    /// Represents the full name of the room.
     /// </summary>
-    string Number,
-
-    /// <summary>
-    /// Represents the type of the room.
-    /// </summary>
-    int RoomType)
+    string FullName)
 {
     /// <summary>
     /// Represents the XML element name for the room.

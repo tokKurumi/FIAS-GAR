@@ -16,9 +16,9 @@ public record Stead(
     int ObjectId,
 
     /// <summary>
-    /// Represents the number of the stead.
+    /// Represents the full name of the stead.
     /// </summary>
-    string Number)
+    string FullName)
 {
     /// <summary>
     /// Represents the XML element name for the stead.

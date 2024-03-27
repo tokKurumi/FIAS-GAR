@@ -16,14 +16,9 @@ public record Apartment(
     int ObjectId,
 
     /// <summary>
-    /// Represents the number of the apartment.
+    /// Represents the full name of the apartment.
     /// </summary>
-    string Number,
-
-    /// <summary>
-    /// Represents the type of the apartment.
-    /// </summary>
-    int ApartType)
+    string FullName)
 {
     /// <summary>
     /// Represents the XML element name for the apartment.

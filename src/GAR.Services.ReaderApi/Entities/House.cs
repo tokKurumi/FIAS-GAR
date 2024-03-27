@@ -16,14 +16,9 @@ public record House(
     int ObjectId,
 
     /// <summary>
-    /// The house number.
+    /// Represents the full name of the house.
     /// </summary>
-    string HouseNum,
-
-    /// <summary>
-    /// The type of the house.
-    /// </summary>
-    int HouseType)
+    string FullName)
 {
     /// <summary>
     /// The XML element name for the house.

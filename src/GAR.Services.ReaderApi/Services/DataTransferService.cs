@@ -21,6 +21,8 @@ public class DataTransferService(
 
     public async Task ImportAsync(CancellationToken cancellationToken = default)
     {
+        await _zipXmlReaderService.InitTypesAsync();
+
         var sw = Stopwatch.StartNew();
 
         await ImportObjectsAsync(cancellationToken);
