@@ -150,23 +150,25 @@ public partial class ZipXmlReaderService : IDisposable
 
                 if (isActual && isActive)
                 {
-                    var id = int.Parse(addressesXmlReader.GetAttribute(AddressObject.XmlNames.Id) ?? throw new ArgumentNullException(AddressObject.XmlNames.Id));
-                    var objectId = int.Parse(addressesXmlReader.GetAttribute(AddressObject.XmlNames.ObjectId) ?? throw new ArgumentNullException(AddressObject.XmlNames.ObjectId));
-                    var typeName = addressesXmlReader.GetAttribute(AddressObject.XmlNames.TypeName) ?? throw new ArgumentNullException(AddressObject.XmlNames.TypeName);
-                    var name = addressesXmlReader.GetAttribute(AddressObject.XmlNames.Name) ?? throw new ArgumentNullException(AddressObject.XmlNames.Name);
-
-                    if (_addressObjectTypes.TryGetValue(typeName, out var addressObjectType))
+                    if (int.TryParse(addressesXmlReader.GetAttribute(AddressObject.XmlNames.Id), out var id) &&
+                        int.TryParse(addressesXmlReader.GetAttribute(AddressObject.XmlNames.ObjectId), out var objectId))
                     {
-                        fullNameBuilder.Clear();
-                        fullNameBuilder.Append(addressObjectType.Name).Append(' ').Append(name);
-                    }
-                    else
-                    {
-                        fullNameBuilder.Clear();
-                        fullNameBuilder.Append(name);
-                    }
+                        var typeName = addressesXmlReader.GetAttribute(AddressObject.XmlNames.TypeName) ?? string.Empty;
+                        var name = addressesXmlReader.GetAttribute(AddressObject.XmlNames.Name);
 
-                    yield return new AddressObject(id, objectId, fullNameBuilder.ToString());
+                        if (_addressObjectTypes.TryGetValue(typeName, out var addressObjectType))
+                        {
+                            fullNameBuilder.Clear();
+                            fullNameBuilder.Append(addressObjectType.Name).Append(' ').Append(name);
+                        }
+                        else
+                        {
+                            fullNameBuilder.Clear();
+                            fullNameBuilder.Append(name);
+                        }
+
+                        yield return new AddressObject(id, objectId, fullNameBuilder.ToString());
+                    }
                 }
             }
         }
@@ -191,23 +193,25 @@ public partial class ZipXmlReaderService : IDisposable
 
                 if (isActual && isActive)
                 {
-                    var id = int.Parse(housesXmlReader.GetAttribute(House.XmlNames.Id) ?? throw new ArgumentNullException(House.XmlNames.Id));
-                    var objectId = int.Parse(housesXmlReader.GetAttribute(House.XmlNames.ObjectId) ?? throw new ArgumentNullException(House.XmlNames.ObjectId));
-                    var houseNum = housesXmlReader.GetAttribute(House.XmlNames.HouseNum) ?? throw new ArgumentNullException(House.XmlNames.HouseNum);
-                    var houseTypeId = int.Parse(housesXmlReader.GetAttribute(House.XmlNames.HouseType) ?? throw new ArgumentNullException(House.XmlNames.HouseType));
-
-                    if (_houseTypes.TryGetValue(houseTypeId, out var houseType))
+                    if (int.TryParse(housesXmlReader.GetAttribute(House.XmlNames.Id), out var id) &&
+                        int.TryParse(housesXmlReader.GetAttribute(House.XmlNames.ObjectId), out var objectId) &&
+                        int.TryParse(housesXmlReader.GetAttribute(House.XmlNames.HouseType), out var houseTypeId))
                     {
-                        fullNameBuilder.Clear();
-                        fullNameBuilder.Append(houseType.Name).Append(' ').Append(houseNum);
-                    }
-                    else
-                    {
-                        fullNameBuilder.Clear();
-                        fullNameBuilder.Append(houseNum);
-                    }
+                        var houseNum = housesXmlReader.GetAttribute(House.XmlNames.HouseNum) ?? string.Empty;
 
-                    yield return new House(id, objectId, fullNameBuilder.ToString());
+                        if (_houseTypes.TryGetValue(houseTypeId, out var houseType))
+                        {
+                            fullNameBuilder.Clear();
+                            fullNameBuilder.Append(houseType.Name).Append(' ').Append(houseNum);
+                        }
+                        else
+                        {
+                            fullNameBuilder.Clear();
+                            fullNameBuilder.Append(houseNum);
+                        }
+
+                        yield return new House(id, objectId, fullNameBuilder.ToString());
+                    }
                 }
             }
         }
@@ -232,23 +236,25 @@ public partial class ZipXmlReaderService : IDisposable
 
                 if (isActual && isActive)
                 {
-                    var id = int.Parse(apartmentsXmlReader.GetAttribute(Apartment.XmlNames.Id) ?? throw new ArgumentNullException(Apartment.XmlNames.Id));
-                    var objectId = int.Parse(apartmentsXmlReader.GetAttribute(Apartment.XmlNames.ObjectId) ?? throw new ArgumentNullException(Apartment.XmlNames.ObjectId));
-                    var number = apartmentsXmlReader.GetAttribute(Apartment.XmlNames.Number) ?? throw new ArgumentNullException(Apartment.XmlNames.Number);
-                    var apartType = int.Parse(apartmentsXmlReader.GetAttribute(Apartment.XmlNames.ApartType) ?? throw new ArgumentNullException(Apartment.XmlNames.ApartType));
-
-                    if (_apartmentTypes.TryGetValue(apartType, out var apartmentType))
+                    if (int.TryParse(apartmentsXmlReader.GetAttribute(Apartment.XmlNames.Id), out var id) &&
+                        int.TryParse(apartmentsXmlReader.GetAttribute(Apartment.XmlNames.ObjectId), out var objectId) &&
+                        int.TryParse(apartmentsXmlReader.GetAttribute(Apartment.XmlNames.ApartType), out var apartType))
                     {
-                        fullNameBuilder.Clear();
-                        fullNameBuilder.Append(apartmentType.Name).Append(' ').Append(number);
-                    }
-                    else
-                    {
-                        fullNameBuilder.Clear();
-                        fullNameBuilder.Append(number);
-                    }
+                        var number = apartmentsXmlReader.GetAttribute(Apartment.XmlNames.Number) ?? string.Empty;
 
-                    yield return new Apartment(id, objectId, fullNameBuilder.ToString());
+                        if (_apartmentTypes.TryGetValue(apartType, out var apartmentType))
+                        {
+                            fullNameBuilder.Clear();
+                            fullNameBuilder.Append(apartmentType.Name).Append(' ').Append(number);
+                        }
+                        else
+                        {
+                            fullNameBuilder.Clear();
+                            fullNameBuilder.Append(number);
+                        }
+
+                        yield return new Apartment(id, objectId, fullNameBuilder.ToString());
+                    }
                 }
             }
         }
@@ -273,23 +279,25 @@ public partial class ZipXmlReaderService : IDisposable
 
                 if (isActual && isActive)
                 {
-                    var id = int.Parse(roomsXmlReader.GetAttribute(Room.XmlNames.Id) ?? throw new ArgumentNullException(Room.XmlNames.Id));
-                    var objectId = int.Parse(roomsXmlReader.GetAttribute(Room.XmlNames.ObjectId) ?? throw new ArgumentNullException(Room.XmlNames.ObjectId));
-                    var number = roomsXmlReader.GetAttribute(Room.XmlNames.Number) ?? throw new ArgumentNullException(Room.XmlNames.Number);
-                    var roomTypeId = int.Parse(roomsXmlReader.GetAttribute(Room.XmlNames.RoomType) ?? throw new ArgumentNullException(Room.XmlNames.RoomType));
-
-                    if (_roomTypes.TryGetValue(roomTypeId, out var roomType))
+                    if (int.TryParse(roomsXmlReader.GetAttribute(Room.XmlNames.Id), out var id) &&
+                        int.TryParse(roomsXmlReader.GetAttribute(Room.XmlNames.ObjectId), out var objectId) &&
+                        int.TryParse(roomsXmlReader.GetAttribute(Room.XmlNames.RoomType), out var roomTypeId))
                     {
-                        fullNameBuilder.Clear();
-                        fullNameBuilder.Append(roomType.Name).Append(' ').Append(number);
-                    }
-                    else
-                    {
-                        fullNameBuilder.Clear();
-                        fullNameBuilder.Append(number);
-                    }
+                        var number = roomsXmlReader.GetAttribute(Room.XmlNames.Number) ?? string.Empty;
 
-                    yield return new Room(id, objectId, fullNameBuilder.ToString());
+                        if (_roomTypes.TryGetValue(roomTypeId, out var roomType))
+                        {
+                            fullNameBuilder.Clear();
+                            fullNameBuilder.Append(roomType.Name).Append(' ').Append(number);
+                        }
+                        else
+                        {
+                            fullNameBuilder.Clear();
+                            fullNameBuilder.Append(number);
+                        }
+
+                        yield return new Room(id, objectId, fullNameBuilder.ToString());
+                    }
                 }
             }
         }
@@ -313,11 +321,13 @@ public partial class ZipXmlReaderService : IDisposable
 
                 if (isActual && isActive)
                 {
-                    var id = int.Parse(steadsXmlReader.GetAttribute(Stead.XmlNames.Id) ?? throw new ArgumentNullException(Stead.XmlNames.Id));
-                    var objectId = int.Parse(steadsXmlReader.GetAttribute(Stead.XmlNames.ObjectId) ?? throw new ArgumentNullException(Stead.XmlNames.ObjectId));
-                    var number = steadsXmlReader.GetAttribute(Stead.XmlNames.Number) ?? throw new ArgumentNullException(Stead.XmlNames.Number);
+                    if (int.TryParse(steadsXmlReader.GetAttribute(Stead.XmlNames.Id), out var id) &&
+                        int.TryParse(steadsXmlReader.GetAttribute(Stead.XmlNames.ObjectId), out var objectId))
+                    {
+                        var number = steadsXmlReader.GetAttribute(Stead.XmlNames.Number) ?? string.Empty;
 
-                    yield return new Stead(id, objectId, number);
+                        yield return new Stead(id, objectId, number);
+                    }
                 }
             }
         }
@@ -341,11 +351,13 @@ public partial class ZipXmlReaderService : IDisposable
 
                 if (isActual && isActive)
                 {
-                    var id = int.Parse(hierarchiesXmlReader.GetAttribute(Hierarchy.XmlNames.Id) ?? throw new ArgumentNullException(Hierarchy.XmlNames.Id));
-                    var objectId = int.Parse(hierarchiesXmlReader.GetAttribute(Hierarchy.XmlNames.ObjectId) ?? throw new ArgumentNullException(Hierarchy.XmlNames.ObjectId));
-                    var path = hierarchiesXmlReader.GetAttribute(Hierarchy.XmlNames.Path) ?? throw new ArgumentNullException(Hierarchy.XmlNames.Path);
+                    if (int.TryParse(hierarchiesXmlReader.GetAttribute(Hierarchy.XmlNames.Id), out var id) &&
+                        int.TryParse(hierarchiesXmlReader.GetAttribute(Hierarchy.XmlNames.ObjectId), out var objectId))
+                    {
+                        var path = hierarchiesXmlReader.GetAttribute(Hierarchy.XmlNames.Path) ?? string.Empty;
 
-                    yield return new Hierarchy(id, objectId, path);
+                        yield return new Hierarchy(id, objectId, path);
+                    }
                 }
             }
         }
