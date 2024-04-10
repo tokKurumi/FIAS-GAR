@@ -6,17 +6,20 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using GAR.Services.ReaderApi.Data;
 using GAR.Services.ReaderApi.Models;
 
 /// <summary>
 /// Provides a service for reading objects from a ZIP file containing XML data.
 /// </summary>
-public partial class ZipXmlReaderService : IDisposable
+public partial class ZipXmlReaderService
+    : IDisposable
 {
     private readonly string _folderPath;
     private readonly int _bucketSize;
 
     private readonly ZipArchive _zipArchive;
+    private readonly XmlCopyHelpers _xmlCopyHelpers;
     private readonly Dictionary<string, Regex> _regexes;
     private readonly Dictionary<string, XmlReader> _readers;
 
@@ -30,17 +33,18 @@ public partial class ZipXmlReaderService : IDisposable
     /// <summary>
     /// Initializes a new instance of the <see cref="ZipXmlReaderService"/> class.
     /// </summary>
-    /// <param name="folderPath">The folder region path.</param>
-    /// <param name="bucketSize">The bucket size.</param>
+    /// <param name="configuration">The configuration.</param>
+    /// <param name="xmlCopyHelpers">The XML copy helpers.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the not all values initialized in <paramref name="configuration"/>.</exception>
     public ZipXmlReaderService(
-        string folderPath,
-        int bucketSize)
+        IConfiguration configuration,
+        XmlCopyHelpers xmlCopyHelpers)
     {
-        _folderPath = folderPath;
-        _bucketSize = bucketSize;
+        _folderPath = configuration["GAR:Folder"] ?? throw new ArgumentNullException("FolderPath", "FolderPath should be configured in Configuration.");
+        _bucketSize = int.Parse(configuration["GAR:BucketSize"] ?? throw new ArgumentNullException("BucketSize", "BucketSize should be configured in Configuration."));
+        _xmlCopyHelpers = xmlCopyHelpers;
 
         _zipArchive = ZipFile.OpenRead(@$"Data/gar_xml.zip");
-
         _regexes = new Dictionary<string, Regex>
         {
             [AddressObjectType.XmlElementName] = AddressObjectTypeRegex(),
@@ -48,14 +52,13 @@ public partial class ZipXmlReaderService : IDisposable
             [ApartmentType.XmlElementName] = ApartmentTypeRegex(),
             [RoomType.XmlElementName] = RoomTypeRegex(),
 
-            [AddressObject.XmlElementName] = new Regex($@"^{folderPath}/AS_ADDR_OBJ_(\d{{8}})_.+\.XML$"),
+            [AddressObject.XmlElementName] = new Regex($@"^{_folderPath}/AS_ADDR_OBJ_(\d{{8}})_.+\.XML$"),
             [House.XmlElementName] = new Regex($@"^{_folderPath}/AS_HOUSES_(\d{{8}})_.+\.XML$"),
             [Apartment.XmlElementName] = new Regex($@"^{_folderPath}/AS_APARTMENTS_(\d{{8}})_.+\.XML$"),
             [Room.XmlElementName] = new Regex($@"^{_folderPath}/AS_ROOMS_(\d{{8}})_.+\.XML$"),
             [Stead.XmlElementName] = new Regex($@"^{_folderPath}/AS_STEADS_(\d{{8}})_.+\.XML$"),
             [Hierarchy.XmlElementName] = new Regex($@"^{_folderPath}/AS_ADM_HIERARCHY_(\d{{8}})_.+\.XML$"),
         };
-
         _readers = new Dictionary<string, XmlReader>
         {
             [AddressObjectType.XmlElementName] = CreateAsyncXmlReader(AddressObjectType.XmlElementName),
@@ -172,6 +175,12 @@ public partial class ZipXmlReaderService : IDisposable
                 }
             }
         }
+    }
+
+    public IAsyncEnumerable<AddressObject> TestAsync()
+    {
+        var addressesXmlReader = _readers[AddressObject.XmlElementName];
+        return _xmlCopyHelpers.Addresses.GetAsync(addressesXmlReader);
     }
 
     /// <summary>

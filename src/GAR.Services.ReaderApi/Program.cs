@@ -5,15 +5,14 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton(provider =>
-{
-    return new ZipXmlReaderService("13", 1_000_000);
-});
+builder.Services.AddSingleton<ZipXmlReaderService>();
+builder.Services.AddSingleton<XmlCopyHelpers>();
 
 builder.AddNpgsqlDataSource("gar-database");
 builder.Services.AddSingleton<DatabaseInitializerService>();
 builder.Services.AddSingleton<SqlCopyHelpers>();
 builder.Services.AddSingleton<DataWriterService>();
+
 builder.Services.AddSingleton<DataTransferService>();
 
 builder.Services.AddControllers();

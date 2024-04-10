@@ -1,9 +1,8 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 var database = builder
-    .AddPostgres("gar-database-postgres-container", password: builder.CreateStablePassword("database-password"))
+    .AddPostgres("gar-database-postgres-container")
     .WithPgAdmin()
-    .WithDataVolume("gar-database")
     .AddDatabase("gar-database");
 
 var readerApi = builder

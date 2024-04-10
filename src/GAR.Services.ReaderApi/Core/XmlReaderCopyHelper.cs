@@ -6,6 +6,7 @@ using System.Xml;
 
 public class XmlReaderCopyHelper<TModel>(
     string name)
+    where TModel : new()
 {
     private readonly string _name = name;
     private readonly Dictionary<string, Expression<Func<TModel, object>>> _mappings = [];
@@ -16,7 +17,7 @@ public class XmlReaderCopyHelper<TModel>(
         return this;
     }
 
-    public async IAsyncEnumerator<TModel> GetAsync(XmlReader reader)
+    public async IAsyncEnumerable<TModel> GetAsync(XmlReader reader)
     {
         while (await reader.ReadAsync())
         {
@@ -33,13 +34,23 @@ public class XmlReaderCopyHelper<TModel>(
 
     private static void SetProperty<TProperty>(TModel item, Expression<Func<TModel, TProperty>> propertyLambda, string value)
     {
-        if (propertyLambda.Body is MemberExpression memberExpression)
+        var memberExpression = propertyLambda.Body as MemberExpression;
+        if (memberExpression is null)
         {
-            var property = (PropertyInfo)memberExpression.Member;
-            var propType = property.PropertyType;
-            var propValue = Convert.ChangeType(value, propType);
-            property.SetValue(item, propValue);
+            var unaryExpression = propertyLambda.Body as UnaryExpression;
+            memberExpression = unaryExpression?.Operand as MemberExpression;
         }
+
+        if (memberExpression is null)
+        {
+            throw new ArgumentException("Invalid property expression");
+        }
+
+        var property = (PropertyInfo)memberExpression.Member;
+        var propType = property.PropertyType;
+        var propValue = Convert.ChangeType(value, propType);
+
+        property.SetValue(item, propValue);
     }
 
     private TModel ReadItem(XmlReader reader)

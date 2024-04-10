@@ -3,23 +3,14 @@
 /// <summary>
 /// Represents an address object.
 /// </summary>
-public record AddressObject(
-
-    /// <summary>
-    /// Represents the identifier of the address.
-    /// </summary>
-    int Id,
-
-    /// <summary>
-    /// Represents the global unique identifier of the object.
-    /// </summary>
-    int ObjectId,
-
-    /// <summary>
-    /// Represents the full name of the address.
-    /// </summary>
-    string FullName)
+public class AddressObject
 {
+    public int Id { get; set; }
+
+    public int ObjectId { get; set; }
+
+    public string FullName { get; set; }
+
     /// <summary>
     /// Represents the XML element name for the address.
     /// </summary>
@@ -29,6 +20,17 @@ public record AddressObject(
     /// Represents the name of the table entity for the AddressObject class.
     /// </summary>
     public const string TableEntityName = "AddressObjects";
+
+    public AddressObject()
+    {
+    }
+
+    public AddressObject(int id, int objectId, string fullName)
+    {
+        Id = id;
+        ObjectId = objectId;
+        FullName = fullName;
+    }
 
     /// <summary>
     /// Represents the XML element names for the properties in the AddressObject class.

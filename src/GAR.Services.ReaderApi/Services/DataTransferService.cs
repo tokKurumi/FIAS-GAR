@@ -63,7 +63,8 @@ public class DataTransferService(
 
         while (_zipXmlReaderService.CanReadObjects)
         {
-            var bucket = _zipXmlReaderService.ReadObjectsAsync();
+            // var bucket = _zipXmlReaderService.ReadObjectsAsync();
+            var bucket = _zipXmlReaderService.TestAsync();
             var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
             _logger.LogInformation("Objects saved from bucket: {Saved}", saved);
