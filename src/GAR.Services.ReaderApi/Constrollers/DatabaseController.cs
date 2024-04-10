@@ -18,7 +18,9 @@ public class DatabaseController(
     [HttpPost]
     public async Task<IActionResult> InitializeAsync(CancellationToken cancellationToken)
     {
-        await _databaseInitializerService.InitializeAsync(cancellationToken);
+        await _databaseInitializerService.EnsureCreatedAsync(cancellationToken);
+        await _databaseInitializerService.CreateSchemaAsync(cancellationToken);
+        await _databaseInitializerService.CreateTablesAsync(cancellationToken);
 
         return Ok();
     }

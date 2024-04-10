@@ -16,6 +16,32 @@ public class DatabaseInitializerService(
 
     private bool _disposed;
 
+    public async Task EnsureCreatedAsync(CancellationToken cancellationToken = default)
+    {
+        await using var cmd = _dataSource.CreateCommand("SELECT 1 FROM pg_catalog.pg_database WHERE datname = 'gar-database'");
+        var exists = await cmd.ExecuteScalarAsync(cancellationToken);
+
+        if (exists is not null)
+        {
+            return;
+        }
+
+        cmd.CommandText = $"CREATE DATABASE 'gar-database'";
+        await cmd.ExecuteNonQueryAsync(cancellationToken);
+
+        _logger.LogInformation("Database was created.");
+    }
+
+    public async Task CreateSchemaAsync(CancellationToken cancellationToken = default)
+    {
+        await using var cmd = _dataSource.CreateCommand(@"
+            CREATE SCHEMA IF NOT EXISTS public;
+        ");
+
+        await cmd.ExecuteNonQueryAsync(cancellationToken);
+        _logger.LogInformation("Schema was created.");
+    }
+
     public async Task DropSchemaAsync(CancellationToken cancellationToken = default)
     {
         await using var cmd = _dataSource.CreateCommand(@"DROP SCHEMA IF EXISTS public CASCADE;");
@@ -24,11 +50,10 @@ public class DatabaseInitializerService(
         _logger.LogInformation("Schema was dropped.");
     }
 
-    public async Task InitializeAsync(CancellationToken cancellationToken = default)
+    public async Task CreateTablesAsync(CancellationToken cancellationToken = default)
     {
         var cw = Stopwatch.StartNew();
 
-        await CreateSchemaAsync(cancellationToken);
         await CreateAddressesTableAsync(cancellationToken);
         await CreateApartmentsTableAsync(cancellationToken);
         await CreateHierarchiesTableAsync(cancellationToken);
@@ -58,16 +83,6 @@ public class DatabaseInitializerService(
         }
 
         _disposed = true;
-    }
-
-    private async Task CreateSchemaAsync(CancellationToken cancellationToken = default)
-    {
-        await using var cmd = _dataSource.CreateCommand(@"
-            CREATE SCHEMA IF NOT EXISTS public;
-        ");
-
-        await cmd.ExecuteNonQueryAsync(cancellationToken);
-        _logger.LogInformation("Schema was created.");
     }
 
     private async Task CreateAddressesTableAsync(CancellationToken cancellationToken = default)

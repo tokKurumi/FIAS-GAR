@@ -3,7 +3,7 @@
 using GAR.Services.ReaderApi.Models;
 using PostgreSQLCopyHelper;
 
-public class DataMapHelper
+public class SqlCopyHelpers
 {
     public IPostgreSQLCopyHelper<AddressObject> Addresses =>
         new PostgreSQLCopyHelper<AddressObject>("public", AddressObject.TableEntityName)

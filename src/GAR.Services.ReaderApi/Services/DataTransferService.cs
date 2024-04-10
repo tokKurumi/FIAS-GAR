@@ -9,13 +9,13 @@ public class DataTransferService(
     ILogger<DataTransferService> logger,
     ZipXmlReaderService zipXmlReaderService,
     DataWriterService dataWriterService,
-    DataMapHelper dataMapHelper)
+    SqlCopyHelpers dataMapHelper)
     : IDisposable
 {
     private readonly ILogger<DataTransferService> _logger = logger;
     private readonly ZipXmlReaderService _zipXmlReaderService = zipXmlReaderService;
     private readonly DataWriterService _dataWriterService = dataWriterService;
-    private readonly DataMapHelper _dataMapHelper = dataMapHelper;
+    private readonly SqlCopyHelpers _dataMapHelper = dataMapHelper;
 
     private bool _disposed;
 
