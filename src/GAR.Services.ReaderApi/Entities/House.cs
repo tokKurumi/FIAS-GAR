@@ -1,4 +1,4 @@
-﻿namespace GAR.Services.ReaderApi.Models;
+﻿namespace GAR.Services.ReaderApi.Entities;
 
 /// <summary>
 /// Represents a house.

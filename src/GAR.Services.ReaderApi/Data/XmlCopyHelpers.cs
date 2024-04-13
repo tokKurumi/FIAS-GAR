@@ -1,8 +1,8 @@
 ﻿namespace GAR.Services.ReaderApi.Data;
 
 using System.Runtime.CompilerServices;
-using GAR.Services.ReaderApi.Core;
-using GAR.Services.ReaderApi.Models;
+using GAR.Services.ReaderApi.Entities;
+using GAR.XmlReaderCopyHelper.Core;
 
 public class XmlCopyHelpers
 {

@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using GAR.ServiceDefaults;
 using GAR.Services.ReaderApi.Data;
 using GAR.Services.ReaderApi.Services;
 using Microsoft.OpenApi.Models;

@@ -1,6 +1,6 @@
 ﻿namespace GAR.Services.ReaderApi.Data;
 
-using GAR.Services.ReaderApi.Models;
+using GAR.Services.ReaderApi.Entities;
 using PostgreSQLCopyHelper;
 
 public class SqlCopyHelpers

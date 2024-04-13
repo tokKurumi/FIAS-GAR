@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.Extensions.Hosting;
 
-namespace Aspire.Hosting;
+namespace GAR.AppHost;
 
 internal static class ParameterExtensions
 {

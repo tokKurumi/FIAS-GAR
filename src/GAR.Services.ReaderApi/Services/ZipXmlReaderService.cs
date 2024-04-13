@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Xml;
 using GAR.Services.ReaderApi.Data;
+using GAR.Services.ReaderApi.Entities;
 using GAR.Services.ReaderApi.Models;
 
 /// <summary>

@@ -3,7 +3,7 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using GAR.Services.ReaderApi.Models;
+using GAR.Services.ReaderApi.Entities;
 using Npgsql;
 
 public class DatabaseInitializerService(

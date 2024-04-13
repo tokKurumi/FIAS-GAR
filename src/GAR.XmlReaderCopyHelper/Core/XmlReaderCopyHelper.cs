@@ -1,4 +1,4 @@
-﻿namespace GAR.Services.ReaderApi.Core;
+﻿namespace GAR.XmlReaderCopyHelper.Core;
 
 using System.Xml;
 
