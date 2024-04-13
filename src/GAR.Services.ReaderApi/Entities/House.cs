@@ -3,22 +3,7 @@
 /// <summary>
 /// Represents a house.
 /// </summary>
-public record House(
-
-    /// <summary>
-    /// Represents the identifier of the house.
-    /// </summary>
-    int Id,
-
-    /// <summary>
-    /// Represents the global unique identifier of the object.
-    /// </summary>
-    int ObjectId,
-
-    /// <summary>
-    /// Represents the full name of the house.
-    /// </summary>
-    string FullName)
+public class House
 {
     /// <summary>
     /// The XML element name for the house.
@@ -26,9 +11,19 @@ public record House(
     public const string XmlElementName = "HOUSE";
 
     /// <summary>
-    /// The name of the table entity for the house.
+    /// Gets or sets the ID of the house.
     /// </summary>
-    public const string TableEntityName = "Houses";
+    public int Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the object ID of the house.
+    /// </summary>
+    public int ObjectId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the full name of the house.
+    /// </summary>
+    public string FullName { get; set; } = string.Empty;
 
     /// <summary>
     /// Provides the XML names of the properties.
@@ -36,7 +31,7 @@ public record House(
     public static class XmlNames
     {
         /// <summary>
-        /// Gets the XML element name for the Id property.
+        /// The XML name of the Id property.
         /// </summary>
         public const string Id = "ID";
 

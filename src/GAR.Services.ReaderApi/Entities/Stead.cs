@@ -3,22 +3,7 @@
 /// <summary>
 /// Represents a stead.
 /// </summary>
-public record Stead(
-
-    /// <summary>
-    /// Represents the identifier of the stead.
-    /// </summary>
-    int Id,
-
-    /// <summary>
-    /// Represents the global unique identifier of the object.
-    /// </summary>
-    int ObjectId,
-
-    /// <summary>
-    /// Represents the full name of the stead.
-    /// </summary>
-    string FullName)
+public class Stead
 {
     /// <summary>
     /// Represents the XML element name for the stead.
@@ -26,9 +11,19 @@ public record Stead(
     public const string XmlElementName = "STEAD";
 
     /// <summary>
-    /// Represents the table entity name for the stead.
+    /// Gets or sets the Id of the stead.
     /// </summary>
-    public const string TableEntityName = "Steads";
+    public int Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ObjectId of the stead.
+    /// </summary>
+    public int ObjectId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the full name of the stead.
+    /// </summary>
+    public string FullName { get; set; } = string.Empty;
 
     /// <summary>
     /// Contains XML element names for the stead properties.

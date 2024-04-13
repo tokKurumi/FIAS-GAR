@@ -3,22 +3,7 @@
 /// <summary>
 /// Represents a hierarchy item.
 /// </summary>
-public record Hierarchy(
-
-    /// <summary>
-    /// Represents the identifier of the hierarchy.
-    /// </summary>
-    int Id,
-
-    /// <summary>
-    /// Represents the global unique identifier of the object.
-    /// </summary>
-    int ObjectId,
-
-    /// <summary>
-    /// Represents the path of the object.
-    /// </summary>
-    string Path)
+public class Hierarchy
 {
     /// <summary>
     /// Represents the XML element name for the hierarchy item.
@@ -26,27 +11,37 @@ public record Hierarchy(
     public const string XmlElementName = "ITEM";
 
     /// <summary>
-    /// Represents the name of the table entity for the hierarchy.
+    /// Gets or sets the ID of the hierarchy item.
     /// </summary>
-    public const string TableEntityName = "Hierarchies";
+    public int Id { get; set; }
 
     /// <summary>
-    /// Represents the XML attribute name for the object ID.
+    /// Gets or sets the object ID of the hierarchy item.
+    /// </summary>
+    public int ObjectId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the path of the hierarchy item.
+    /// </summary>
+    public string Path { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Represents the XML attribute names for the hierarchy item.
     /// </summary>
     public static class XmlNames
     {
         /// <summary>
-        /// Gets the XML element name for the Id property.
+        /// Represents the XML attribute name for the ID property.
         /// </summary>
         public const string Id = "ID";
 
         /// <summary>
-        /// Represents the XML attribute name for the object ID.
+        /// Represents the XML attribute name for the object ID property.
         /// </summary>
         public const string ObjectId = "OBJECTID";
 
         /// <summary>
-        /// Represents the XML attribute name for the object path.
+        /// Represents the XML attribute name for the path property.
         /// </summary>
         public const string Path = "PATH";
     }

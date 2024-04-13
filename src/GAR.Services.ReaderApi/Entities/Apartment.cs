@@ -3,22 +3,7 @@
 /// <summary>
 /// Represents an apartment.
 /// </summary>
-public record Apartment(
-
-    /// <summary>
-    /// Represents the identifier of the apartment.
-    /// </summary>
-    int Id,
-
-    /// <summary>
-    /// Represents the global unique identifier of the object.
-    /// </summary>
-    int ObjectId,
-
-    /// <summary>
-    /// Represents the full name of the apartment.
-    /// </summary>
-    string FullName)
+public class Apartment
 {
     /// <summary>
     /// Represents the XML element name for the apartment.
@@ -26,9 +11,19 @@ public record Apartment(
     public const string XmlElementName = "APARTMENT";
 
     /// <summary>
-    /// Represents the table entity name for the apartment.
+    /// Gets or sets the Id of the apartment.
     /// </summary>
-    public const string TableEntityName = "Apartments";
+    public int Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ObjectId of the apartment.
+    /// </summary>
+    public int ObjectId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the full name of the apartment.
+    /// </summary>
+    public string FullName { get; set; } = string.Empty;
 
     /// <summary>
     /// Contains XML element names for the apartment properties.

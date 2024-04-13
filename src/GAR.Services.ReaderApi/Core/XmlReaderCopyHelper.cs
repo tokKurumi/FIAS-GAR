@@ -2,21 +2,29 @@
 
 using System.Xml;
 
-public class XmlReaderCopyHelper<TModel>(string name)
+public class XmlReaderCopyHelper<TModel>(
+    string name)
+    where TModel : new()
 {
     private readonly string _name = name;
-    private readonly List<(IEnumerable<string> Attributes, Action<TModel, IReadOnlyList<string>> Setter)> _mappings = [];
+    private readonly Dictionary<IEnumerable<string>, Action<TModel, IReadOnlyList<string>>> _mappings = [];
+    private readonly Dictionary<string, Predicate<string>> _conditions = [];
 
-    public XmlReaderCopyHelper<TModel> Map(IEnumerable<string> attributeNames, Action<TModel, IReadOnlyList<string>> setter)
+    public XmlReaderCopyHelper<TModel> Map(string attributeName, Action<TModel, string> setter)
     {
-        _mappings.Add((attributeNames, setter));
+        _mappings.Add([attributeName], (model, values) => setter(model, values[0]));
         return this;
     }
 
-    public XmlReaderCopyHelper<TModel> Map(string attributeName, Action<TModel, string> propertyAction)
+    public XmlReaderCopyHelper<TModel> Map(IEnumerable<string> attributeNames, Action<TModel, IReadOnlyList<string>> setter)
     {
-        _mappings.Add(([attributeName], (model, values) => propertyAction(model, values.First())));
+        _mappings.Add(attributeNames, setter);
+        return this;
+    }
 
+    public XmlReaderCopyHelper<TModel> WithCondition(string attributeName, Predicate<string> condition)
+    {
+        _conditions.Add(attributeName, condition);
         return this;
     }
 
@@ -24,13 +32,31 @@ public class XmlReaderCopyHelper<TModel>(string name)
     {
         while (await reader.ReadAsync())
         {
-            if (reader.NodeType == XmlNodeType.Element && reader.Name == _name)
+            if (reader.NodeType != XmlNodeType.Element || reader.Name != _name)
+            {
+                continue;
+            }
+
+            var flagConditions = true;
+            foreach (var (attribute, predicate) in _conditions)
+            {
+                var conditionAttributeValue = reader.GetAttribute(attribute);
+
+                if (conditionAttributeValue is not null)
+                {
+                    flagConditions &= predicate(conditionAttributeValue);
+                }
+
+                if (!flagConditions)
+                {
+                    break;
+                }
+            }
+
+            if (flagConditions)
             {
                 var item = ReadItem(reader);
-                if (item is not null)
-                {
-                    yield return item;
-                }
+                yield return item;
             }
         }
     }

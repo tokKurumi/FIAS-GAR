@@ -3,22 +3,7 @@
 /// <summary>
 /// Represents a room.
 /// </summary>
-public record Room(
-
-    /// <summary>
-    /// Represents the identifier of the room.
-    /// </summary>
-    int Id,
-
-    /// <summary>
-    /// Represents the global unique identifier of the object.
-    /// </summary>
-    int ObjectId,
-
-    /// <summary>
-    /// Represents the full name of the room.
-    /// </summary>
-    string FullName)
+public class Room
 {
     /// <summary>
     /// Represents the XML element name for the room.
@@ -26,9 +11,19 @@ public record Room(
     public const string XmlElementName = "ROOM";
 
     /// <summary>
-    /// Represents the name of the table entity for the room.
+    /// Gets or sets the Id of the room.
     /// </summary>
-    public const string TableEntityName = "Rooms";
+    public int Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ObjectId of the room.
+    /// </summary>
+    public int ObjectId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the full name of the room.
+    /// </summary>
+    public string FullName { get; set; } = string.Empty;
 
     /// <summary>
     /// Contains XML element names for the room properties.

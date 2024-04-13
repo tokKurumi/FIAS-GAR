@@ -101,7 +101,7 @@ public class DatabaseInitializerService(
     private async Task CreateApartmentsTableAsync(CancellationToken cancellationToken = default)
     {
         await using var cmd = _dataSource.CreateCommand($"""
-            CREATE TABLE IF NOT EXISTS public."{Apartment.TableEntityName}" (
+            CREATE TABLE IF NOT EXISTS public."{nameof(Apartment)}" (
                 "{nameof(Apartment.Id)}" SERIAL PRIMARY KEY,
                 "{nameof(Apartment.ObjectId)}" integer NOT NULL,
                 "{nameof(Apartment.FullName)}" text NOT NULL
@@ -114,7 +114,7 @@ public class DatabaseInitializerService(
     private async Task CreateHierarchiesTableAsync(CancellationToken cancellationToken = default)
     {
         await using var cmd = _dataSource.CreateCommand($"""
-            CREATE TABLE IF NOT EXISTS public."{Hierarchy.TableEntityName}" (
+            CREATE TABLE IF NOT EXISTS public."{nameof(Hierarchy)}" (
                 "{nameof(Hierarchy.Id)}" SERIAL PRIMARY KEY,
                 "{nameof(Hierarchy.ObjectId)}" integer NOT NULL,
                 "{nameof(Hierarchy.Path)}" text NOT NULL
@@ -127,7 +127,7 @@ public class DatabaseInitializerService(
     private async Task CreateHousesTableAsync(CancellationToken cancellationToken = default)
     {
         await using var cmd = _dataSource.CreateCommand($"""
-            CREATE TABLE IF NOT EXISTS public."{House.TableEntityName}" (
+            CREATE TABLE IF NOT EXISTS public."{nameof(House)}" (
                 "{nameof(House.Id)}" SERIAL PRIMARY KEY,
                 "{nameof(House.ObjectId)}" integer NOT NULL,
                 "{nameof(House.FullName)}" text NOT NULL
@@ -140,7 +140,7 @@ public class DatabaseInitializerService(
     private async Task CreateRoomsTableAsync(CancellationToken cancellationToken = default)
     {
         await using var cmd = _dataSource.CreateCommand($"""
-            CREATE TABLE IF NOT EXISTS public."{Room.TableEntityName}" (
+            CREATE TABLE IF NOT EXISTS public."{nameof(Room)}" (
                 "{nameof(Room.Id)}" SERIAL PRIMARY KEY,
                 "{nameof(Room.ObjectId)}" integer NOT NULL,
                 "{nameof(Room.FullName)}" text NOT NULL
@@ -153,7 +153,7 @@ public class DatabaseInitializerService(
     private async Task CreateSteadsTableAsync(CancellationToken cancellationToken = default)
     {
         await using var cmd = _dataSource.CreateCommand($"""
-            CREATE TABLE IF NOT EXISTS public."{Stead.TableEntityName}" (
+            CREATE TABLE IF NOT EXISTS public."{nameof(Stead)}" (
                 "{nameof(Stead.Id)}" SERIAL PRIMARY KEY,
                 "{nameof(Stead.ObjectId)}" integer NOT NULL,
                 "{nameof(Stead.FullName)}" text NOT NULL

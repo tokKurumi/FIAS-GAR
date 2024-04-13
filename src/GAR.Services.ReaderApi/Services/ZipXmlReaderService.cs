@@ -2,8 +2,6 @@
 
 using System.Collections.Generic;
 using System.IO.Compression;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using GAR.Services.ReaderApi.Data;
@@ -138,46 +136,7 @@ public partial class ZipXmlReaderService
     /// Reads the objects asynchronously.
     /// </summary>
     /// <returns>An asynchronous enumerable of <see cref="AddressObject"/>.</returns>
-    public async IAsyncEnumerable<AddressObject> ReadObjectsAsync()
-    {
-        var addressesXmlReader = _readers[AddressObject.XmlElementName];
-        var fullNameBuilder = new StringBuilder();
-
-        for (int i = 0; i < _bucketSize && CanReadObjects; i++)
-        {
-            CanReadObjects = await addressesXmlReader.ReadAsync().ConfigureAwait(false);
-
-            if (addressesXmlReader is { NodeType: XmlNodeType.Element, Name: AddressObject.XmlElementName })
-            {
-                var (isActual, isActive) = GetActualAndActive(addressesXmlReader);
-
-                if (isActual && isActive)
-                {
-                    if (int.TryParse(addressesXmlReader.GetAttribute(AddressObject.XmlNames.Id), out var id) &&
-                        int.TryParse(addressesXmlReader.GetAttribute(AddressObject.XmlNames.ObjectId), out var objectId))
-                    {
-                        var typeName = addressesXmlReader.GetAttribute(AddressObject.XmlNames.TypeName) ?? string.Empty;
-                        var name = addressesXmlReader.GetAttribute(AddressObject.XmlNames.Name);
-
-                        if (_addressObjectTypes.TryGetValue(typeName, out var addressObjectType))
-                        {
-                            fullNameBuilder.Clear();
-                            fullNameBuilder.Append(addressObjectType.Name).Append(' ').Append(name);
-                        }
-                        else
-                        {
-                            fullNameBuilder.Clear();
-                            fullNameBuilder.Append(name);
-                        }
-
-                        yield return new AddressObject(id, objectId, fullNameBuilder.ToString());
-                    }
-                }
-            }
-        }
-    }
-
-    public IAsyncEnumerable<AddressObject> TestAsync()
+    public IAsyncEnumerable<AddressObject> ReadObjectsAsync()
     {
         var addressesXmlReader = _readers[AddressObject.XmlElementName];
         return _xmlCopyHelpers.Addresses.GetAsync(addressesXmlReader);
@@ -187,189 +146,50 @@ public partial class ZipXmlReaderService
     /// Reads the houses asynchronously.
     /// </summary>
     /// <returns>An asynchronous enumerable of <see cref="House"/>.</returns>
-    public async IAsyncEnumerable<House> ReadHousesAsync()
+    public IAsyncEnumerable<House> ReadHousesAsync()
     {
         var housesXmlReader = _readers[House.XmlElementName];
-        var fullNameBuilder = new StringBuilder();
-
-        for (int i = 0; i < _bucketSize && CanReadHouses; i++)
-        {
-            CanReadHouses = await housesXmlReader.ReadAsync().ConfigureAwait(false);
-
-            if (housesXmlReader is { NodeType: XmlNodeType.Element, Name: House.XmlElementName })
-            {
-                var (isActual, isActive) = GetActualAndActive(housesXmlReader);
-
-                if (isActual && isActive)
-                {
-                    if (int.TryParse(housesXmlReader.GetAttribute(House.XmlNames.Id), out var id) &&
-                        int.TryParse(housesXmlReader.GetAttribute(House.XmlNames.ObjectId), out var objectId) &&
-                        int.TryParse(housesXmlReader.GetAttribute(House.XmlNames.HouseType), out var houseTypeId))
-                    {
-                        var houseNum = housesXmlReader.GetAttribute(House.XmlNames.HouseNum) ?? string.Empty;
-
-                        if (_houseTypes.TryGetValue(houseTypeId, out var houseType))
-                        {
-                            fullNameBuilder.Clear();
-                            fullNameBuilder.Append(houseType.Name).Append(' ').Append(houseNum);
-                        }
-                        else
-                        {
-                            fullNameBuilder.Clear();
-                            fullNameBuilder.Append(houseNum);
-                        }
-
-                        yield return new House(id, objectId, fullNameBuilder.ToString());
-                    }
-                }
-            }
-        }
+        return _xmlCopyHelpers.Houses.GetAsync(housesXmlReader);
     }
 
     /// <summary>
     /// Reads the apartments asynchronously.
     /// </summary>
     /// <returns>An asynchronous enumerable of <see cref="Apartment"/>.</returns>
-    public async IAsyncEnumerable<Apartment> ReadApartmentsAsync()
+    public IAsyncEnumerable<Apartment> ReadApartmentsAsync()
     {
         var apartmentsXmlReader = _readers[Apartment.XmlElementName];
-        var fullNameBuilder = new StringBuilder();
-
-        for (int i = 0; i < _bucketSize && CanReadApartments; i++)
-        {
-            CanReadApartments = await apartmentsXmlReader.ReadAsync().ConfigureAwait(false);
-
-            if (apartmentsXmlReader is { NodeType: XmlNodeType.Element, Name: Apartment.XmlElementName })
-            {
-                var (isActual, isActive) = GetActualAndActive(apartmentsXmlReader);
-
-                if (isActual && isActive)
-                {
-                    if (int.TryParse(apartmentsXmlReader.GetAttribute(Apartment.XmlNames.Id), out var id) &&
-                        int.TryParse(apartmentsXmlReader.GetAttribute(Apartment.XmlNames.ObjectId), out var objectId) &&
-                        int.TryParse(apartmentsXmlReader.GetAttribute(Apartment.XmlNames.ApartType), out var apartType))
-                    {
-                        var number = apartmentsXmlReader.GetAttribute(Apartment.XmlNames.Number) ?? string.Empty;
-
-                        if (_apartmentTypes.TryGetValue(apartType, out var apartmentType))
-                        {
-                            fullNameBuilder.Clear();
-                            fullNameBuilder.Append(apartmentType.Name).Append(' ').Append(number);
-                        }
-                        else
-                        {
-                            fullNameBuilder.Clear();
-                            fullNameBuilder.Append(number);
-                        }
-
-                        yield return new Apartment(id, objectId, fullNameBuilder.ToString());
-                    }
-                }
-            }
-        }
+        return _xmlCopyHelpers.Apartments.GetAsync(apartmentsXmlReader);
     }
 
     /// <summary>
     /// Reads the rooms asynchronously.
     /// </summary>
     /// <returns>An asynchronous enumerable of <see cref="Room"/>.</returns>
-    public async IAsyncEnumerable<Room> ReadRoomsAsync()
+    public IAsyncEnumerable<Room> ReadRoomsAsync()
     {
         var roomsXmlReader = _readers[Room.XmlElementName];
-        var fullNameBuilder = new StringBuilder();
-
-        for (int i = 0; i < _bucketSize && CanReadRooms; i++)
-        {
-            CanReadRooms = await roomsXmlReader.ReadAsync().ConfigureAwait(false);
-
-            if (roomsXmlReader is { NodeType: XmlNodeType.Element, Name: Room.XmlElementName })
-            {
-                var (isActual, isActive) = GetActualAndActive(roomsXmlReader);
-
-                if (isActual && isActive)
-                {
-                    if (int.TryParse(roomsXmlReader.GetAttribute(Room.XmlNames.Id), out var id) &&
-                        int.TryParse(roomsXmlReader.GetAttribute(Room.XmlNames.ObjectId), out var objectId) &&
-                        int.TryParse(roomsXmlReader.GetAttribute(Room.XmlNames.RoomType), out var roomTypeId))
-                    {
-                        var number = roomsXmlReader.GetAttribute(Room.XmlNames.Number) ?? string.Empty;
-
-                        if (_roomTypes.TryGetValue(roomTypeId, out var roomType))
-                        {
-                            fullNameBuilder.Clear();
-                            fullNameBuilder.Append(roomType.Name).Append(' ').Append(number);
-                        }
-                        else
-                        {
-                            fullNameBuilder.Clear();
-                            fullNameBuilder.Append(number);
-                        }
-
-                        yield return new Room(id, objectId, fullNameBuilder.ToString());
-                    }
-                }
-            }
-        }
+        return _xmlCopyHelpers.Rooms.GetAsync(roomsXmlReader);
     }
 
     /// <summary>
     /// Reads the steads asynchronously.
     /// </summary>
     /// <returns>An asynchronous enumerable of <see cref="Stead"/>.</returns>
-    public async IAsyncEnumerable<Stead> ReadSteadsAsync()
+    public IAsyncEnumerable<Stead> ReadSteadsAsync()
     {
         var steadsXmlReader = _readers[Stead.XmlElementName];
-
-        for (int i = 0; i < _bucketSize && CanReadSteads; i++)
-        {
-            CanReadSteads = await steadsXmlReader.ReadAsync().ConfigureAwait(false);
-
-            if (steadsXmlReader is { NodeType: XmlNodeType.Element, Name: Stead.XmlElementName })
-            {
-                var (isActual, isActive) = GetActualAndActive(steadsXmlReader);
-
-                if (isActual && isActive)
-                {
-                    if (int.TryParse(steadsXmlReader.GetAttribute(Stead.XmlNames.Id), out var id) &&
-                        int.TryParse(steadsXmlReader.GetAttribute(Stead.XmlNames.ObjectId), out var objectId))
-                    {
-                        var number = steadsXmlReader.GetAttribute(Stead.XmlNames.Number) ?? string.Empty;
-
-                        yield return new Stead(id, objectId, number);
-                    }
-                }
-            }
-        }
+        return _xmlCopyHelpers.Steads.GetAsync(steadsXmlReader);
     }
 
     /// <summary>
     /// Reads the hierarchies asynchronously.
     /// </summary>
     /// <returns>An asynchronous enumerable of <see cref="Hierarchy"/>.</returns>
-    public async IAsyncEnumerable<Hierarchy> ReadHierarchiesAsync()
+    public IAsyncEnumerable<Hierarchy> ReadHierarchiesAsync()
     {
         var hierarchiesXmlReader = _readers[Hierarchy.XmlElementName];
-
-        for (int i = 0; i < _bucketSize && CanReadHierarchies; i++)
-        {
-            CanReadHierarchies = await hierarchiesXmlReader.ReadAsync().ConfigureAwait(false);
-
-            if (hierarchiesXmlReader is { NodeType: XmlNodeType.Element, Name: Hierarchy.XmlElementName })
-            {
-                var (isActual, isActive) = GetActualAndActive(hierarchiesXmlReader);
-
-                if (isActual && isActive)
-                {
-                    if (int.TryParse(hierarchiesXmlReader.GetAttribute(Hierarchy.XmlNames.Id), out var id) &&
-                        int.TryParse(hierarchiesXmlReader.GetAttribute(Hierarchy.XmlNames.ObjectId), out var objectId))
-                    {
-                        var path = hierarchiesXmlReader.GetAttribute(Hierarchy.XmlNames.Path) ?? string.Empty;
-
-                        yield return new Hierarchy(id, objectId, path);
-                    }
-                }
-            }
-        }
+        return _xmlCopyHelpers.Hierarchies.GetAsync(hierarchiesXmlReader);
     }
 
     public void Dispose()
@@ -409,18 +229,6 @@ public partial class ZipXmlReaderService
 
     [GeneratedRegex(@"^AS_ROOM_TYPES_(\d{8})_.+\.XML$")]
     private static partial Regex RoomTypeRegex();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static (bool IsActual, bool IsActive) GetActualAndActive(XmlReader reader)
-    {
-        var isActualAttribute = reader.GetAttribute("ISACTUAL");
-        var isActiveAttribute = reader.GetAttribute("ISACTIVE");
-
-        bool isActual = isActualAttribute == null || isActualAttribute == "1" || (bool.TryParse(isActualAttribute, out var isActualValue) && isActualValue);
-        bool isActive = isActiveAttribute == null || isActiveAttribute == "1" || (bool.TryParse(isActiveAttribute, out var isActiveValue) && isActiveValue);
-
-        return (isActual, isActive);
-    }
 
     private async IAsyncEnumerable<AddressObjectType> ReadAddressObjectTypesAsync()
     {

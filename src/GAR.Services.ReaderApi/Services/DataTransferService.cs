@@ -61,16 +61,10 @@ public class DataTransferService(
         var dataMapper = _dataMapHelper.Addresses;
         var sw = Stopwatch.StartNew();
 
-        while (_zipXmlReaderService.CanReadObjects)
-        {
-            // var bucket = _zipXmlReaderService.ReadObjectsAsync();
-            var bucket = _zipXmlReaderService.TestAsync();
-            var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
+        var bucket = _zipXmlReaderService.ReadObjectsAsync();
+        var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
-            _logger.LogInformation("Objects saved from bucket: {Saved}", saved);
-        }
-
-        _logger.LogInformation("Objects copying has ended in {Milliseconds}", sw.ElapsedMilliseconds);
+        _logger.LogInformation("Objects copying has ended in {Milliseconds}ms, saved {Saved} objects", sw.ElapsedMilliseconds, saved);
     }
 
     private async Task ImportApartmentsAsync(CancellationToken cancellationToken = default)
@@ -78,15 +72,10 @@ public class DataTransferService(
         var dataMapper = _dataMapHelper.Apartments;
         var sw = Stopwatch.StartNew();
 
-        while (_zipXmlReaderService.CanReadApartments)
-        {
-            var bucket = _zipXmlReaderService.ReadApartmentsAsync();
-            var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
+        var bucket = _zipXmlReaderService.ReadApartmentsAsync();
+        var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
-            _logger.LogInformation("Apartments saved from bucket: {Saved}", saved);
-        }
-
-        _logger.LogInformation("Apartments copying has ended in {Milliseconds}", sw.ElapsedMilliseconds);
+        _logger.LogInformation("Apartments copying has ended in {Milliseconds}ms, saved {Saved} objects", sw.ElapsedMilliseconds, saved);
     }
 
     private async Task ImportHierarchiesAsync(CancellationToken cancellationToken = default)
@@ -94,15 +83,10 @@ public class DataTransferService(
         var dataMapper = _dataMapHelper.Hierarchies;
         var sw = Stopwatch.StartNew();
 
-        while (_zipXmlReaderService.CanReadHierarchies)
-        {
-            var bucket = _zipXmlReaderService.ReadHierarchiesAsync();
-            var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
+        var bucket = _zipXmlReaderService.ReadHierarchiesAsync();
+        var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
-            _logger.LogInformation("Hierarchies saved from bucket: {Saved}", saved);
-        }
-
-        _logger.LogInformation("Hierarchies copying has ended in {Milliseconds}", sw.ElapsedMilliseconds);
+        _logger.LogInformation("Hierarchies copying has ended in {Milliseconds}ms, saved {Saved} objects", sw.ElapsedMilliseconds, saved);
     }
 
     private async Task ImportHousesAsync(CancellationToken cancellationToken = default)
@@ -110,15 +94,10 @@ public class DataTransferService(
         var dataMapper = _dataMapHelper.Houses;
         var sw = Stopwatch.StartNew();
 
-        while (_zipXmlReaderService.CanReadHouses)
-        {
-            var bucket = _zipXmlReaderService.ReadHousesAsync();
-            var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
+        var bucket = _zipXmlReaderService.ReadHousesAsync();
+        var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
-            _logger.LogInformation("Houses saved from bucket: {Saved}", saved);
-        }
-
-        _logger.LogInformation("Houses copying has ended in {Milliseconds}", sw.ElapsedMilliseconds);
+        _logger.LogInformation("Houses copying has ended in {Milliseconds}ms, saved {Saved} objects", sw.ElapsedMilliseconds, saved);
     }
 
     private async Task ImportRoomsAsync(CancellationToken cancellationToken = default)
@@ -126,15 +105,10 @@ public class DataTransferService(
         var dataMapper = _dataMapHelper.Rooms;
         var sw = Stopwatch.StartNew();
 
-        while (_zipXmlReaderService.CanReadRooms)
-        {
-            var bucket = _zipXmlReaderService.ReadRoomsAsync();
-            var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
+        var bucket = _zipXmlReaderService.ReadRoomsAsync();
+        var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
-            _logger.LogInformation("Rooms saved from bucket: {Saved}", saved);
-        }
-
-        _logger.LogInformation("Rooms copying has ended in {Milliseconds}", sw.ElapsedMilliseconds);
+        _logger.LogInformation("Rooms copying has ended in {Milliseconds}ms, saved {Saved} objects", sw.ElapsedMilliseconds, saved);
     }
 
     private async Task ImportSteadsAsync(CancellationToken cancellationToken = default)
@@ -142,14 +116,9 @@ public class DataTransferService(
         var dataMapper = _dataMapHelper.Steads;
         var sw = Stopwatch.StartNew();
 
-        while (_zipXmlReaderService.CanReadSteads)
-        {
-            var bucket = _zipXmlReaderService.ReadSteadsAsync();
-            var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
+        var bucket = _zipXmlReaderService.ReadSteadsAsync();
+        var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
-            _logger.LogInformation("Steads saved from bucket: {Saved}", saved);
-        }
-
-        _logger.LogInformation("Steads copying has ended in {Milliseconds}", sw.ElapsedMilliseconds);
+        _logger.LogInformation("Steads copying has ended in {Milliseconds}ms, saved {Saved} objects", sw.ElapsedMilliseconds, saved);
     }
 }
