@@ -6,7 +6,7 @@ using PostgreSQLCopyHelper;
 public class SqlCopyHelpers
 {
     public IPostgreSQLCopyHelper<AddressObject> Addresses =>
-        new PostgreSQLCopyHelper<AddressObject>("public", AddressObject.TableEntityName)
+        new PostgreSQLCopyHelper<AddressObject>("public", nameof(AddressObject))
             .UsePostgresQuoting()
             .MapInteger(nameof(AddressObject.Id), x => x.Id)
             .MapInteger(nameof(AddressObject.ObjectId), x => x.ObjectId)

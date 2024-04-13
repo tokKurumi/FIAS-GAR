@@ -7,6 +7,7 @@ public class XmlCopyHelpers
 {
     public XmlReaderCopyHelper<AddressObject> Addresses =>
         new XmlReaderCopyHelper<AddressObject>(AddressObject.XmlElementName)
-            .Map(AddressObject.XmlNames.Id, ao => ao.Id)
-            .Map(AddressObject.XmlNames.ObjectId, ao => ao.ObjectId);
+            .Map(AddressObject.XmlNames.Id, (ao, value) => ao.Id = int.Parse(value))
+            .Map(AddressObject.XmlNames.ObjectId, (ao, value) => ao.ObjectId = int.Parse(value))
+            .Map([AddressObject.XmlNames.TypeName, AddressObject.XmlNames.Name], (ao, values) => ao.FullName = $"{values[0]} {values[1]}");
 }

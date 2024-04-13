@@ -5,21 +5,7 @@
 /// </summary>
 public class AddressObject
 {
-    public int Id { get; set; }
-
-    public int ObjectId { get; set; }
-
-    public string FullName { get; set; }
-
-    /// <summary>
-    /// Represents the XML element name for the address.
-    /// </summary>
     public const string XmlElementName = "OBJECT";
-
-    /// <summary>
-    /// Represents the name of the table entity for the AddressObject class.
-    /// </summary>
-    public const string TableEntityName = "AddressObjects";
 
     public AddressObject()
     {
@@ -31,6 +17,12 @@ public class AddressObject
         ObjectId = objectId;
         FullName = fullName;
     }
+
+    public int Id { get; set; }
+
+    public int ObjectId { get; set; }
+
+    public string FullName { get; set; } = string.Empty;
 
     /// <summary>
     /// Represents the XML element names for the properties in the AddressObject class.

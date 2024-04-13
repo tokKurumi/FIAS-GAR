@@ -88,7 +88,7 @@ public class DatabaseInitializerService(
     private async Task CreateAddressesTableAsync(CancellationToken cancellationToken = default)
     {
         await using var cmd = _dataSource.CreateCommand($"""
-            CREATE TABLE IF NOT EXISTS public."{AddressObject.TableEntityName}" (
+            CREATE TABLE IF NOT EXISTS public."{nameof(AddressObject)}" (
                 "{nameof(AddressObject.Id)}" SERIAL PRIMARY KEY,
                 "{nameof(AddressObject.ObjectId)}" integer NOT NULL,
                 "{nameof(AddressObject.FullName)}" text NOT NULL

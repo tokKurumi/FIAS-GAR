@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GAR.ServiceDefaults", "GAR.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{A3BBB232-1E4D-44AF-A246-868E718C93F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GAR.Services.ReaderApi", "GAR.Services.ReaderApi\GAR.Services.ReaderApi.csproj", "{C3C5F0FA-DAAB-4BFC-8FFF-941E6535AD05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GAR.Services.ReaderApi", "GAR.Services.ReaderApi\GAR.Services.ReaderApi.csproj", "{C3C5F0FA-DAAB-4BFC-8FFF-941E6535AD05}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
