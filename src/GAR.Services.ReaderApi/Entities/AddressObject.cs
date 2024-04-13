@@ -1,8 +1,11 @@
 ﻿namespace GAR.Services.ReaderApi.Entities;
 
+using GAR.XmlReaderCopyHelper.Core;
+
 /// <summary>
 /// Represents an address object.
 /// </summary>
+[XmlElementName("OBJECT")]
 public class AddressObject
 {
     /// <summary>

@@ -1,14 +1,25 @@
 ﻿namespace GAR.XmlReaderCopyHelper.Core;
 
+using System.Reflection;
 using System.Xml;
 
-public class XmlReaderCopyHelper<TModel>(
-    string name)
+public class XmlReaderCopyHelper<TModel>
     where TModel : new()
 {
-    private readonly string _name = name;
+    private readonly string _name;
     private readonly Dictionary<IEnumerable<string>, Action<TModel, IReadOnlyList<string>>> _mappings = [];
     private readonly Dictionary<string, Predicate<string>> _conditions = [];
+
+    public XmlReaderCopyHelper(string name)
+        => _name = name;
+
+    public XmlReaderCopyHelper()
+    {
+        var nameAttribute = typeof(TModel).GetCustomAttribute<XmlElementNameAttribute>()
+            ?? throw new ArgumentException("TModel must have XmlElementNameAttribute", nameof(TModel));
+
+        _name = nameAttribute.ElementName;
+    }
 
     public XmlReaderCopyHelper<TModel> Map(string attributeName, Action<TModel, string> setter)
     {

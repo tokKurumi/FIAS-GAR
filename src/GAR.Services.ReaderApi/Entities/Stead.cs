@@ -1,8 +1,11 @@
 ﻿namespace GAR.Services.ReaderApi.Entities;
 
+using GAR.XmlReaderCopyHelper.Core;
+
 /// <summary>
 /// Represents a stead.
 /// </summary>
+[XmlElementName("STEAD")]
 public class Stead
 {
     /// <summary>

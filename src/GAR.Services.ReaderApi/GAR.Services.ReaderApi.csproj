@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <CodeAnalysisRuleSet>../common.ruleset</CodeAnalysisRuleSet>
     </PropertyGroup>
+    
     <ItemGroup>
         <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.0.0" />
         <PackageReference Include="PostgreSQLCopyHelper" Version="2.8.0" />
@@ -16,6 +17,7 @@
         <PackageReference Include="System.Linq.Async" Version="6.0.1" />
         <PackageReference Include="Aspire.Npgsql" Version="8.0.0-preview.5.24201.12" />
     </ItemGroup>
+    
     <ItemGroup>
         <ProjectReference Include="..\GAR.ServiceDefaults\GAR.ServiceDefaults.csproj" />
         <ProjectReference Include="..\GAR.XmlReaderCopyHelper\GAR.XmlReaderCopyHelper.csproj" />

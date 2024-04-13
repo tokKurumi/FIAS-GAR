@@ -1,8 +1,11 @@
 ﻿namespace GAR.Services.ReaderApi.Entities;
 
+using GAR.XmlReaderCopyHelper.Core;
+
 /// <summary>
 /// Represents a house.
 /// </summary>
+[XmlElementName("HOUSE")]
 public class House
 {
     /// <summary>
