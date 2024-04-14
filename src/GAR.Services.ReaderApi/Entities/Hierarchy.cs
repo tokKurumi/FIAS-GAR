@@ -1,11 +1,13 @@
 ﻿namespace GAR.Services.ReaderApi.Entities;
 
+using GAR.Services.ReaderApi.Attributes;
 using GAR.XmlReaderCopyHelper.Core;
 
 /// <summary>
 /// Represents a hierarchy item.
 /// </summary>
 [XmlElementName("ITEM")]
+[ZipEntryName("ITEM")]
 public class Hierarchy
 {
     /// <summary>

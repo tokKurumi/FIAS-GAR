@@ -7,13 +7,13 @@ using GAR.Services.ReaderApi.Data;
 
 public class DataTransferService(
     ILogger<DataTransferService> logger,
-    ZipXmlReaderService zipXmlReaderService,
+    ZipXmlParserService zipXmlReaderService,
     DataWriterService dataWriterService,
     SqlCopyHelpers dataMapHelper)
     : IDisposable
 {
     private readonly ILogger<DataTransferService> _logger = logger;
-    private readonly ZipXmlReaderService _zipXmlReaderService = zipXmlReaderService;
+    private readonly ZipXmlParserService _zipXmlReaderService = zipXmlReaderService;
     private readonly DataWriterService _dataWriterService = dataWriterService;
     private readonly SqlCopyHelpers _dataMapHelper = dataMapHelper;
 

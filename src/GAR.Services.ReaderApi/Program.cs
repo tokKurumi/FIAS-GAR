@@ -7,7 +7,9 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<ZipXmlReaderService>();
-builder.Services.AddSingleton<XmlCopyHelpers>();
+builder.Services.AddSingleton<ZipXmlParserService>();
+builder.Services.AddSingleton<XmlTypesCopyHelpers>();
+builder.Services.AddSingleton<XmlDataCopyHelpers>();
 
 builder.AddNpgsqlDataSource("gar-database");
 builder.Services.AddSingleton<DatabaseInitializerService>();

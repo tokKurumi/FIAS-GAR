@@ -1,11 +1,13 @@
 ﻿namespace GAR.Services.ReaderApi.Entities;
 
+using GAR.Services.ReaderApi.Attributes;
 using GAR.XmlReaderCopyHelper.Core;
 
 /// <summary>
 /// Represents an address object.
 /// </summary>
 [XmlElementName("OBJECT")]
+[ZipEntryName("OBJECT")]
 public class AddressObject
 {
     /// <summary>

@@ -1,11 +1,13 @@
 ﻿namespace GAR.Services.ReaderApi.Entities;
 
+using GAR.Services.ReaderApi.Attributes;
 using GAR.XmlReaderCopyHelper.Core;
 
 /// <summary>
 /// Represents an apartment.
 /// </summary>
 [XmlElementName("APARTMENT")]
+[ZipEntryName("APARTMENT")]
 public class Apartment
 {
     /// <summary>
