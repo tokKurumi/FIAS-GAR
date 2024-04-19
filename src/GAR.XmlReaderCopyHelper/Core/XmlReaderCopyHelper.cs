@@ -74,15 +74,16 @@ public class XmlReaderCopyHelper<TModel>
 
     private TModel ReadItem(XmlReader reader)
     {
-        var item = Activator.CreateInstance<TModel>();
+        var item = new TModel();
 
         foreach (var (attributes, setter) in _mappings)
         {
             var values = attributes
                 .Select(reader.GetAttribute)
-                .Where(val => val is not null);
+                .Where(val => val is not null)
+                .ToList();
 
-            setter(item, values.ToList()!);
+            setter(item, values!);
         }
 
         return item;
