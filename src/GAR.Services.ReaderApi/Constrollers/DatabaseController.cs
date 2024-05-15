@@ -9,11 +9,13 @@ using Microsoft.AspNetCore.Mvc;
 [Route("v{version:apiVersion}/[controller]")]
 public class DatabaseController(
     DatabaseInitializerService databaseInitializerService,
-    DataTransferService dataTransferService)
+    DataTransferService dataTransferService,
+    JoinSqlFullAddressService joinSqlFullAddressService)
     : ControllerBase
 {
     private readonly DatabaseInitializerService _databaseInitializerService = databaseInitializerService;
     private readonly DataTransferService _dataTransferService = dataTransferService;
+    private readonly JoinSqlFullAddressService _joinSqlFullAddressService = joinSqlFullAddressService;
 
     [HttpPost]
     public async Task<IActionResult> InitializeAsync(CancellationToken cancellationToken)
@@ -37,6 +39,14 @@ public class DatabaseController(
     public async Task<IActionResult> ImportAsync(CancellationToken cancellationToken)
     {
         await _dataTransferService.ImportAsync(cancellationToken);
+
+        return Ok();
+    }
+
+    [HttpPost("join")]
+    public async Task<IActionResult> JoinAsync(CancellationToken cancellationToken)
+    {
+        await _joinSqlFullAddressService.JoinFullAddressAsync(cancellationToken);
 
         return Ok();
     }

@@ -10,6 +10,7 @@ builder.Services.AddSingleton<ZipXmlReaderService>();
 builder.Services.AddSingleton<ZipXmlParserService>();
 builder.Services.AddSingleton<XmlTypesCopyHelpers>();
 builder.Services.AddSingleton<XmlDataCopyHelpers>();
+builder.Services.AddSingleton<JoinSqlFullAddressService>();
 
 builder.AddNpgsqlDataSource("gar-database");
 builder.Services.AddSingleton<DatabaseInitializerService>();
