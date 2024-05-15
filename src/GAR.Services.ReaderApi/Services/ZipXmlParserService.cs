@@ -137,15 +137,15 @@ public partial class ZipXmlParserService(
     private void ApplyTypesMapping()
     {
         _xmlDataCopyHelpers.Addresses
-            .Map([AddressObject.XmlNames.TypeName, AddressObject.XmlNames.Name], (ao, values) => ao.FullName = $"{_addressObjectTypes[values[0]]} {values[1]}");
+            .Map([AddressObject.XmlNames.TypeName, AddressObject.XmlNames.Name], (ao, values) => ao.FullName = $"{_addressObjectTypes[values[0]].Name} {values[1]}");
 
         _xmlDataCopyHelpers.Houses
-            .Map([House.XmlNames.HouseType, House.XmlNames.HouseNum], (h, values) => h.FullName = $"{_houseTypes[int.Parse(values[0])]} {values[1]}");
+            .Map([House.XmlNames.HouseType, House.XmlNames.HouseNum], (h, values) => h.FullName = $"{_houseTypes[int.Parse(values[0])].Name} {values[1]}");
 
         _xmlDataCopyHelpers.Apartments
-            .Map([Apartment.XmlNames.ApartType, Apartment.XmlNames.Number], (a, values) => a.FullName = $"{_apartmentTypes[int.Parse(values[0])]} {values[1]}");
+            .Map([Apartment.XmlNames.ApartType, Apartment.XmlNames.Number], (a, values) => a.FullName = $"{_apartmentTypes[int.Parse(values[0])].Name} {values[1]}");
 
         _xmlDataCopyHelpers.Rooms
-            .Map([Room.XmlNames.RoomType, Room.XmlNames.Number], (r, values) => r.FullName = $"{_roomTypes[int.Parse(values[0])]} {values[1]}");
+            .Map([Room.XmlNames.RoomType, Room.XmlNames.Number], (r, values) => r.FullName = $"{_roomTypes[int.Parse(values[0])].Name} {values[1]}");
     }
 }
