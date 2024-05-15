@@ -54,5 +54,25 @@ public class House
         /// The XML name of the HouseType property.
         /// </summary>
         public const string HouseType = "HOUSETYPE";
+
+        /// <summary>
+        /// The XML name of the AddNum1 property.
+        /// </summary>
+        public const string AddNum1 = "ADDNUM1";
+
+        /// <summary>
+        /// The XML name of the AddType1 property.
+        /// </summary>
+        public const string AddType1 = "ADDTYPE1";
+
+        /// <summary>
+        /// The XML name of the AddNum2 property.
+        /// </summary>
+        public const string AddNum2 = "ADDNUM2";
+
+        /// <summary>
+        /// The XML name of the AddType2 property.
+        /// </summary>
+        public const string AddType2 = "ADDTYPE2";
     }
 }

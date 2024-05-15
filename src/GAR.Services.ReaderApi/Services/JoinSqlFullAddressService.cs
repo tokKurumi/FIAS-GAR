@@ -14,7 +14,7 @@ public class JoinSqlFullAddressService(
     {
         var sw = Stopwatch.StartNew();
         await using var cmd = _dataSource.CreateCommand(@"
-            CREATE TABLE IF NOT EXISTS public.""FullAddress"" AS
+            CREATE TEMP TABLE IF NOT EXISTS tmp_Parts AS
             WITH RECURSIVE PathParts AS (
                 SELECT
                     ""ObjectId"",
@@ -36,30 +36,29 @@ public class JoinSqlFullAddressService(
                 WHERE
                     part_index < cardinality(parts_array)
             )
+            SELECT * FROM PathParts;
+
+            CREATE TEMP TABLE IF NOT EXISTS tmp_FullNames AS
+            SELECT ""FullName"", ""ObjectId"" FROM ""AddressObject""
+            UNION ALL
+            SELECT ""FullName"", ""ObjectId"" FROM ""House""
+            UNION ALL
+            SELECT ""FullName"", ""ObjectId"" FROM ""Apartment""
+            UNION ALL
+            SELECT ""FullName"", ""ObjectId"" FROM ""Room""
+            UNION ALL
+            SELECT ""FullName"", ""ObjectId"" FROM ""Stead"";
+
+            CREATE TABLE IF NOT EXISTS public.""FullAddress"" AS
             SELECT
                 h.""ObjectId"",
                 h.""Path"",
-                STRING_AGG(COALESCE(obj.""FullName"", ''), ', ' ORDER BY pp.part_index) AS ""Address""
+                STRING_AGG(COALESCE(fn.""FullName"", ''), ', ' ORDER BY pp.part_index) AS ""Address""
             FROM
-                PathParts pp
+                tmp_Parts pp
             JOIN
                 ""Hierarchy"" h ON h.""Path"" = pp.""Path""
-            LEFT JOIN LATERAL (
-                SELECT ""FullName""
-                FROM (
-                    SELECT ""FullName"", ""ObjectId"" FROM ""AddressObject""
-                    UNION ALL
-                    SELECT ""FullName"", ""ObjectId"" FROM ""House""
-                    UNION ALL
-                    SELECT ""FullName"", ""ObjectId"" FROM ""Apartment""
-                    UNION ALL
-                    SELECT ""FullName"", ""ObjectId"" FROM ""Room""
-                    UNION ALL
-                    SELECT ""FullName"", ""ObjectId"" FROM ""Stead""
-                ) AS sub
-                WHERE sub.""ObjectId""::text = pp.part_value
-                LIMIT 1
-            ) AS obj ON TRUE
+            LEFT JOIN tmp_FullNames fn ON fn.""ObjectId""::text = pp.part_value
             GROUP BY h.""ObjectId"", h.""Path"";
         ");
 

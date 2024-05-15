@@ -78,12 +78,13 @@ public class XmlReaderCopyHelper<TModel>
 
         foreach (var (attributes, setter) in _mappings)
         {
+            var t = attributes.ToList();
+
             var values = attributes
-                .Select(reader.GetAttribute)
-                .Where(val => val is not null)
+                .Select(a => reader.GetAttribute(a) ?? string.Empty)
                 .ToList();
 
-            setter(item, values!);
+            setter(item, values);
         }
 
         return item;
