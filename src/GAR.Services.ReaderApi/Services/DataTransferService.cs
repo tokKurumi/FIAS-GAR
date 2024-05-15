@@ -64,6 +64,7 @@ public class DataTransferService(
         var bucket = _zipXmlReaderService.ReadObjectsAsync();
         var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
+        sw.Stop();
         _logger.LogInformation("Objects copying has ended in {Milliseconds}ms, saved {Saved} objects", sw.ElapsedMilliseconds, saved);
     }
 
@@ -75,6 +76,7 @@ public class DataTransferService(
         var bucket = _zipXmlReaderService.ReadApartmentsAsync();
         var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
+        sw.Stop();
         _logger.LogInformation("Apartments copying has ended in {Milliseconds}ms, saved {Saved} objects", sw.ElapsedMilliseconds, saved);
     }
 
@@ -86,6 +88,7 @@ public class DataTransferService(
         var bucket = _zipXmlReaderService.ReadHierarchiesAsync();
         var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
+        sw.Stop();
         _logger.LogInformation("Hierarchies copying has ended in {Milliseconds}ms, saved {Saved} objects", sw.ElapsedMilliseconds, saved);
     }
 
@@ -97,6 +100,7 @@ public class DataTransferService(
         var bucket = _zipXmlReaderService.ReadHousesAsync();
         var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
+        sw.Stop();
         _logger.LogInformation("Houses copying has ended in {Milliseconds}ms, saved {Saved} objects", sw.ElapsedMilliseconds, saved);
     }
 
@@ -108,6 +112,7 @@ public class DataTransferService(
         var bucket = _zipXmlReaderService.ReadRoomsAsync();
         var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
+        sw.Stop();
         _logger.LogInformation("Rooms copying has ended in {Milliseconds}ms, saved {Saved} objects", sw.ElapsedMilliseconds, saved);
     }
 
@@ -119,6 +124,7 @@ public class DataTransferService(
         var bucket = _zipXmlReaderService.ReadSteadsAsync();
         var saved = await _dataWriterService.ImportAsync(dataMapper, bucket, cancellationToken);
 
+        sw.Stop();
         _logger.LogInformation("Steads copying has ended in {Milliseconds}ms, saved {Saved} objects", sw.ElapsedMilliseconds, saved);
     }
 }
