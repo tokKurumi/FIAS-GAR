@@ -1,0 +1,1 @@
+bin/elasticsearch-plugin install https://github.com/nickyat/elasticsearch-analysis-morphology/releases/download/8.9.1/elasticsearch-analysis-morphology-8.9.1.zip
