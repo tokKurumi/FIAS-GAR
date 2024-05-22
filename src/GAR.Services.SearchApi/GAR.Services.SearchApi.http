@@ -1,0 +1,6 @@
+@GAR.Services.SearchApi_HostAddress = http://localhost:5083
+
+GET {{GAR.Services.SearchApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
