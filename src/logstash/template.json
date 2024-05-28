@@ -1,0 +1,56 @@
+{
+  "index_patterns": [
+    "fulladdress*"
+  ],
+  "template": {
+    "mappings": {
+      "properties": {
+        "address": {
+          "type": "text",
+          "analyzer": "russian_custom_analyzer"
+        },
+        "path": {
+          "type": "text"
+        },
+        "objectid": {
+          "type": "long"
+        }
+      }
+    },
+    "settings": {
+      "analysis": {
+        "filter": {
+          "russian_synonym": {
+            "type": "synonym",
+            "ignore_case": true,
+            "synonyms": [
+              "город, гор., гор, г., г => город",
+              "республика, респ., респ => республика"
+            ]
+          },
+          "russian_stemmer": {
+            "type": "stemmer",
+            "language": "russian"
+          }
+        },
+        "analyzer": {
+          "russian_custom_analyzer": {
+            "tokenizer": "lowercase",
+            "filter": [
+              "lowercase",
+              "russian_synonym",
+              "russian_stemmer",
+              "shingle_filter",
+              "russian_morphology",
+              {
+                "type": "shingle",
+                "max_shingle_size": 3,
+                "output_unigrams": true
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

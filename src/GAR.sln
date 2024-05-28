@@ -13,7 +13,25 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GAR.Services.ReaderApi", "G
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GAR.XmlReaderCopyHelper", "GAR.XmlReaderCopyHelper\GAR.XmlReaderCopyHelper.csproj", "{E387DBC3-0ED8-4E0C-B67E-1A03C46D8037}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GAR.Services.SearchApi", "GAR.Services.SearchApi\GAR.Services.SearchApi.csproj", "{20798359-9127-44D6-B228-0DDE838FEF51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GAR.Services.SearchApi", "GAR.Services.SearchApi\GAR.Services.SearchApi.csproj", "{20798359-9127-44D6-B228-0DDE838FEF51}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "logstash", "logstash", "{F7FFF0BE-3F0D-4283-983B-78950BED7ED2}"
+	ProjectSection(SolutionItems) = preProject
+		logstash\logstash.conf = logstash\logstash.conf
+		logstash\postgresql-42.2.20.jar = logstash\postgresql-42.2.20.jar
+		logstash\script.sql = logstash\script.sql
+		logstash\template.json = logstash\template.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "elasticsearch", "elasticsearch", "{22288906-C8A8-41E9-A31E-0592B93FEF26}"
+	ProjectSection(SolutionItems) = preProject
+		elasticsearch\plugin install.sh = elasticsearch\plugin install.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sql", "sql", "{138FCD69-D820-4915-A308-C61FF5161B7B}"
+	ProjectSection(SolutionItems) = preProject
+		sql\FullName.sql = sql\FullName.sql
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
