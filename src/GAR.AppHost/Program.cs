@@ -27,6 +27,7 @@ var readerApi = builder
     .WithReference(database);
 
 var searchApi = builder
-    .AddProject<Projects.GAR_Services_SearchApi>("gar-services-searchapi");
+    .AddProject<Projects.GAR_Services_SearchApi>("gar-services-searchapi")
+    .WithEnvironment("elasticsearch", "http://localhost:9200");
 
 builder.Build().Run();
