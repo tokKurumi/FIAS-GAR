@@ -1,14 +1,15 @@
 ﻿namespace GAR.Services.SearchApi.Models;
 
+using System.Text.Json.Serialization;
+
 public class FullAddress
 {
-    public string Address { get; set; }
+    [JsonPropertyName("address")]
+    public string Address { get; set; } = string.Empty;
 
-    public int ObjectId { get; set; }
+    [JsonPropertyName("objectid")]
+    public long ObjectId { get; set; }
 
-    public string Version { get; set; }
-
-    public DateTime Timestamp { get; set; }
-
-    public string Path { get; set; }
+    [JsonPropertyName("path")]
+    public string Path { get; set; } = string.Empty;
 }
