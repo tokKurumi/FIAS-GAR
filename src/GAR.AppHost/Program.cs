@@ -7,12 +7,12 @@ var elasticsearch = builder.AddContainer("elasticsearch", "elasticsearch", "8.9.
     .WithVolume("gar-elastic-plugins", "/usr/share/elasticsearch/plugins")
     .WithHttpEndpoint(9200, targetPort: 9200);
 
-//var logstash = builder.AddContainer("logstash", "logstash", "8.13.4")
-//    .WithBindMount("../logstash/logstash.conf", "/usr/share/logstash/pipeline/logstash.conf")
-//    .WithBindMount("../logstash/script.sql", "/usr/share/logstash/config/queries/script.sql")
-//    .WithBindMount("../logstash/postgresql-42.2.20.jar", "/usr/share/logstash/postgresql-42.2.20.jar")
-//    .WithBindMount("../logstash/template.json", "/usr/share/logstash/template.json")
-//    .WithEnvironment("LS_JAVA_OPTS", "-Xmx1g -Xms1g");
+var logstash = builder.AddContainer("logstash", "logstash", "8.13.4")
+    .WithBindMount("../logstash/logstash.conf", "/usr/share/logstash/pipeline/logstash.conf")
+    .WithBindMount("../logstash/script.sql", "/usr/share/logstash/config/queries/script.sql")
+    .WithBindMount("../logstash/postgresql-42.2.20.jar", "/usr/share/logstash/postgresql-42.2.20.jar")
+    .WithBindMount("../logstash/template.json", "/usr/share/logstash/template.json")
+    .WithEnvironment("LS_JAVA_OPTS", "-Xmx1g -Xms1g");
 
 var databasePassword = builder.AddParameter("gar-database-postgres-container-password", true);
 
